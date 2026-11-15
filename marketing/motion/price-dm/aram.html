@@ -9,7 +9,7 @@ body{margin:0;background:#000}canvas{display:block}</style></head><body>
 <script>
 // WiyMood · «Գինը՝ Direct-ով» v2 · ink + riso colour washes, 2.5D. Every spoken line has its own picture.
 // LINES is a placeholder until the voice is recorded; every scene and beat is keyed to LINES, so re-timing = editing LINES.
-const LINES=[[0.1, 2.42, "Ծանոթացեք՝ Արամն է։ Նա համեղ տորթեր է թխում։"], [2.6, 6.95, "Արամը կարծում է, որ արել է ամեն ինչ, որ հաճախորդներն իրեն նկատեն։ Նույնիսկ կայք ունի։"], [7.35, 9.83, "Դե, կայք ասելը մի փոքր չափազանցություն է…"], [10.01, 12.33, "Բացվում է այնքան դանդաղ, որ տորթը կհասցնի հնանալ։"], [12.51, 15.12, "Հսկա լոգո ու «Բարի գալուստ»։ Ի՞նչ է վաճառում՝ գուշակեք։"], [15.3, 17.33, "Մենյուն՝ PDF, կարդալու համար մանրադիտակ է պետք։"], [17.51, 19.25, "Գին չկա, կոճակ չկա, միայն «զանգահարեք»։"], [19.43, 21.46, "Գնորդները մտնում են ու գնում մրցակցի մոտ։"], [21.64, 23.09, "Իսկ Արամը մեղադրում է Instagram-ին։"], [23.49, 26.68, "Եթե Արամը գար WiyMood, կունենար կայք, որը բացվում է մի ակնթարթում,"], [26.86, 29.47, "տորթերն այնպես է ցույց տալիս, որ բերանդ ջրվում է,"], [29.65, 31.97, "գինը երևում է, պատվերը՝ երեք քայլ, վճարումը՝ առցանց։"], [32.15, 34.76, "Ու Արամը կբողոքեր միայն մի բանից՝ չի հասցնում թխել։"], [35.16, 38.64, "Եթե Ձեր կյանքն էլ Արամի կյանքի նման է, գրեք «ԲՐԵՆԴ»՝ անվճար կնայենք։"]];
+const LINES=[[0.1, 2.42, "Ծանոթացեք՝ Արամն է։ Նա համեղ տորթեր է թխում։"], [2.6, 6.95, "Արամը կարծում է, որ արել է ամեն ինչ, որ հաճախորդներն իրեն նկատեն։ Նույնիսկ կայք ունի։"], [7.35, 9.83, "Դե, կայք ասելը մի փոքր չափազանցություն է…"], [10.01, 12.33, "Բացվում է այնքան դանդաղ, որ տորթը կհասցնի հնանալ։"], [12.51, 15.12, "Հսկա լոգո ու «Բարի գալուստ»։ Ի՞նչ է վաճառում՝ գուշակեք։"], [15.3, 17.33, "Մենյուն՝ PDF, կարդալու համար մանրադիտակ է պետք։"], [17.51, 19.25, "Գին չկա, կոճակ չկա, միայն «զանգահարեք»։"], [19.43, 21.46, "Գնորդները մտնում են ու գնում մրցակցի մոտ։"], [21.64, 23.09, "Իսկ Արամը մեղադրում է Instagram-ին։"], [23.49, 26.68, "Եթե Արամը գար WiyMood, կունենար կայք, որը բացվում է մի ակնթարթում,"], [26.86, 29.47, "տորթերն այնպես է ցուցադրում, կարծես Լուվրում նկարներ ես դիտում,"], [29.65, 31.97, "գինը երևում է, պատվերը՝ երեք քայլ, վճարումը՝ առցանց։"], [32.15, 34.76, "Ու Արամը կբողոքեր միայն մի բանից՝ չի հասցնում թխել։"], [35.16, 38.64, "Եթե Ձեր կյանքն էլ Արամի կյանքի նման է, գրեք «ԲՐԵՆԴ»՝ անվճար կնայենք։"]];
 const T=i=>LINES[i][0],TE=i=>LINES[i][1],END=LINES[13][1]+2.6,TURN=T(9);
 const PAPER=K.paper,DEEP='#0B1B33',BLUE=K.blue,RED=K.red,GREY=K.grey,TBLUE='#CFE0F5',TRED='#FCD6D1';
 // ---------- colour + depth helpers ----------
@@ -198,14 +198,18 @@ scene(T(9)-.35,T(10)-.35,9100,2300,(t)=>{const ap=E.land(P(t,T(9)-.2,T(9)+.3));
  const st=P(t,T(9)+.1,T(9)+.45);if(st>0)phone(650,950,.85*E.heavy(st),.04,1,(w,h)=>goodSite(t,w,h),{id:10710});
  if(t>T(9)+.45){stopwatch(870,420,.9,0,1,10720,PAPER);tf(870,560,1,0,()=>pill(0,0,'0.8 վ',40,{bg:YEL,fg:K.ink,p:P(t,T(9)+.9,T(9)+1.1),id:10730}));}
  if(t>T(9)+.7)for(let i=0;i<3;i++)ink([[[960-i*30,700+i*20],[920-i*30,780+i*20],[960-i*30,780+i*20],[920-i*30,860+i*20]]],{w:6,col:YEL,id:10740+i,dbl:0,prog:pen(t,T(9)+.7+i*.1,.2)});});
-// S10 mouth-watering cakes
+// S10 the cakes shown like paintings in the Louvre
 scene(T(10)-.35,T(11)-.35,10400,2300,(t)=>{
- lifted(1.2,()=>tilt(540,760,1,.03,-.05,()=>{solid(-380,-360,760,720,40,PAPER);solid(-350,-330,700,500,30,'#FBE7E3');
-  for(let i=0;i<9;i++){const a=-Math.PI/2+(i-4)*.18;ink(Sh.line(0,-330,Math.cos(a)*520,-330+Math.sin(a)*520),{w:10,col:YEL,id:10800+i,dbl:0,alpha:.35});}
-  cake(0,-60,1.05,1,10820,{tint:TRED});[[-120,-140],[-40,-150],[50,-148],[130,-140]].forEach(([x,y],i)=>shape(Sh.circle(x,y,18),{fill:RED,id:10850+i,w:3,off:0}));
-  txt('Ելակով ու մասկարպոնեով',0,240,36,{w:900});txt('Թխում ենք պատվերի օրը',0,295,26,{w:600,col:GREY});}));
- person(190,1460,.82,{...B[0],id:10870,mood:'love',look:1});const dr=(t*1.1)%1;ink(Sh.bez([220,1410],[226,1420+dr*40],[212,1430+dr*40],[220,1420+dr*40]),{w:4,col:BLUE,id:10930,dbl:0,alpha:1-dr});
- if(t>T(10)+.4)tf(900,1250,1,.1,()=>itxt('մմմ…',0,0,60,{id:10940,col:RED,prog:pen(t,T(10)+.4,.4)}));});
+ for(let i=0;i<9;i++){const a=Math.PI/2+(i-4)*.09;ink(Sh.line(540,40,540+Math.cos(a)*1100,40+Math.sin(a)*1100),{w:14,col:YEL,id:10800+i,dbl:0,alpha:.22});}
+ lifted(1.4,()=>tilt(540,700,1,.02,-.04,()=>{solid(-400,-380,800,700,10,'#C9A227');solid(-370,-350,740,640,6,'#E8C766');solid(-340,-320,680,580,4,'#FBE7E3');
+  [[-385,-365],[385,-365],[-385,305],[385,305]].forEach(([x,y],i)=>{ink(Sh.circle(x,y,26),{w:5,col:'#8A6A12',id:10810+i,dbl:0});ink(Sh.circle(x,y,12),{w:3,col:'#8A6A12',id:10815+i,dbl:0});});
+  ink(Sh.rect(-340,-320,680,580),{w:4,col:'#8A6A12',id:10819,dbl:0});
+  cake(0,-10,1.0,1,10820,{tint:TRED});[[-120,-90],[-40,-100],[50,-98],[130,-90]].forEach(([x,y],i)=>shape(Sh.circle(x,y,18),{fill:RED,id:10850+i,w:3,off:0}));}));
+ tf(540,1135,1,0,()=>{lifted(.5,()=>solid(-230,-55,460,110,8,PAPER));ink(Sh.rect(-230,-55,460,110),{w:3,id:10860,dbl:0});txt('«Տորթ ելակով», 2026',0,-16,30,{w:900});txt('կրեմ, մասկարպոնե, սեր',0,22,22,{w:600,col:GREY,f:'serif'});});
+ [[170,1260],[910,1260]].forEach(([x,y],i)=>{ink(join(Sh.line(x,y,x,y+200),Sh.ellipse(x,y+205,40,12)),{w:6,col:'#C9A227',id:10870+i*3,dbl:0});shape(Sh.circle(x,y-8,16),{fill:YEL,line:'#8A6A12',id:10871+i*3,w:3,off:0});});
+ ink(Sh.quad([170,1270],[540,1360],[910,1270]),{w:12,col:RED,id:10880,dbl:0,gaps:0});
+ const ap=E.land(P(t,T(10)+.2,T(10)+.8));person(L(-150,300,ap),1450,.62,{...B[3],id:10890,mood:'love',look:1,walk:ap<1?t*8:null,arms:[[.2,.2],[2.6,.5]],hold:(h)=>{tf(h[1][0],h[1][1]-10,1,0,()=>{shape(Sh.rrect(-14,-40,28,60,8),{fill:DEEP,id:10960,w:3,off:0});});}});
+ if(t>T(10)+.7)tf(880,240,1,.1,()=>itxt('Վա՜յ…',0,0,64,{id:10940,col:RED,prog:pen(t,T(10)+.7,.4)}));});
 // S11 price shows, 3 steps, paid online
 scene(T(11)-.35,T(12)-.35,11700,2300,(t)=>{const L12=TE(11)-T(11);
  const pr=P(t,T(11),T(11)+.3),st=Math.floor(cl((t-T(11)-L12*.35)/(L12*.35))*3.99),pd=P(t,T(11)+L12*.78,T(11)+L12*.78+.3);
@@ -255,7 +259,7 @@ function wrapWords(words){const lines=[[]];X.font=`700 ${CAP_SIZE}px SA`;for(con
 // three caption looks (CAPSTYLE): 'glass' frosted navy, 'tape' torn paper strip, 'sketch' frosted paper with an ink outline
 window.CAPSTYLE=window.CAPSTYLE||'sketch';
 const BL=document.createElement('canvas');BL.width=W;BL.height=H;const BX=BL.getContext('2d');
-const KEYW=/չափազանցություն|դանդաղ|հնանալ|գուշակեք|մանրադիտակ|կոճակ|մրցակցի|Instagram|ակնթարթում|ջրվում|առցանց|թխել|ԲՐԵՆԴ|անվճար/i;
+const KEYW=/չափազանցություն|դանդաղ|հնանալ|գուշակեք|մանրադիտակ|կոճակ|մրցակցի|Instagram|ակնթարթում|Լուվրում|առցանց|թխել|ԲՐԵՆԴ|անվճար/i;
 function frost(x,y,w,h,r,tint,blur=16){X.save();X.beginPath();X.roundRect(x,y,w,h,r);X.clip();BX.setTransform(1,0,0,1,0,0);BX.clearRect(0,0,W,H);BX.drawImage(c,0,0);X.filter=`blur(${blur}px)`;X.drawImage(BL,0,0);X.filter='none';X.fillStyle=tint;X.fillRect(x,y,w,h);X.restore();}
 function tornPoly(x,y,w,h,seed){let s=seed;const R=()=>{s=(s*16807)%2147483647;return s/2147483647;};const pts=[];for(let i=0;i<=24;i++)pts.push([x+w*i/24,y+(R()-.5)*7]);for(let i=24;i>=0;i--)pts.push([x+w*i/24,y+h+(R()-.5)*7]);pts.push([x-4,y+h/2]);return pts;}
 function captions(t){const ln=LINES.find(l=>t>=l[0]-.05&&t<=l[1]+.25);if(!ln||window.NOCAP)return;if(t<.05)return;const st=window.CAPSTYLE;
