@@ -207,7 +207,7 @@ function depthLayer(arr,k,par,blur,alpha,w,colFn){const cx=k[1],cy=k[2],z=k[3];F
 const CAP_SIZE=48,CAP_MAXW=840,CAP_Y=1560;
 function wrapWords(words){const lines=[[]];X.font=`700 ${CAP_SIZE}px SA`;for(const w of words){const cur=lines[lines.length-1];if(X.measureText([...cur,w].join(' ')).width>CAP_MAXW&&cur.length)lines.push([w]);else cur.push(w);}return lines;}
 // three caption looks (CAPSTYLE): 'glass' frosted navy, 'tape' torn paper strip, 'sketch' frosted paper with an ink outline
-window.CAPSTYLE=window.CAPSTYLE||'glass';
+window.CAPSTYLE=window.CAPSTYLE||'sketch';
 const BL=document.createElement('canvas');BL.width=W;BL.height=H;const BX=BL.getContext('2d');
 const KEYW=/Direct|թանկ|մրցակցի|իմանում|Գրեք|առանց|արագ|գուշակում|Թաքցնում|կորցնում|Ջնջում|գրառման|Highlights|մերժեմ|որոշեցի/;
 function frost(x,y,w,h,r,tint,blur=16){X.save();X.beginPath();X.roundRect(x,y,w,h,r);X.clip();BX.setTransform(1,0,0,1,0,0);BX.clearRect(0,0,W,H);BX.drawImage(c,0,0);X.filter=`blur(${blur}px)`;X.drawImage(BL,0,0);X.filter='none';X.fillStyle=tint;X.fillRect(x,y,w,h);X.restore();}
