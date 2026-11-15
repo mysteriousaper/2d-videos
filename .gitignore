@@ -9,3 +9,5 @@ prev/
 *.mp4
 z_*.jpg
 __pycache__/
+node_modules
+shots/
