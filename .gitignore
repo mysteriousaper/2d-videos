@@ -11,3 +11,5 @@ z_*.jpg
 __pycache__/
 node_modules
 shots/
+capdemo/
+caption_options.jpg
