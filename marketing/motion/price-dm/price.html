@@ -7,199 +7,224 @@ body{margin:0;background:#000}canvas{display:block}</style></head><body>
 <script>const W=1080,H=1920,c=document.getElementById('c'),X=c.getContext('2d');Ink.init(X);const {Sh,ink,inkText,INK,join}=Ink;</script>
 <script src="lib.js"></script>
 <script>
-// WiyMood · «Գինը՝ Direct-ով» · ink reel, 2.5D: one sheet, depth layers, lifted paper, one red price tag as the thread.
-// Timeline below is a PLACEHOLDER until the real voice is recorded (then every scene is re-timed to Whisper words).
-const LINES=[[0.0,1.5,'Գինը՝ Direct-ով։'],[1.6,3.0,'Ու ես թերթում եմ առաջ։'],[3.4,5.4,'Գին չկա, ուրեմն գուշակում եմ։'],[5.6,7.0,'Ու միշտ՝ թանկ։'],
- [7.6,9.0,'Կարող եմ հարցնել, բայց…'],[9.2,10.6,'Իսկ եթե թանկ լինի՞։'],[10.8,12.0,'Ինչպե՞ս մերժեմ։'],[12.2,14.2,'Հետո էլ կգրեն՝ «դե, որոշեցի՞ք»։'],
- [14.6,17.8,'Ու գնում եմ մրցակցի մոտ, որտեղ գինը գրված է։'],[18.8,22.4,'Իսկ դուք չեք էլ իմանում, որ ես եղել եմ ձեր էջում։'],[23.0,24.4,'Գրեք գինը։'],
- [25.0,28.2,'Ամեն գրառման տակ՝ գինը, կամ գոնե «12 000-ից»։'],[28.6,31.4,'Գնացուցակը՝ Highlights-ում ու կայքում։'],[31.8,34.2,'Պատվեր ու վճարում՝ առանց խոսելու։'],
- [34.6,37.6,'Direct-ը՝ անհատական պատվերներին․ արագ ու գնով։'],[38.2,40.6,'Երբ գինը թաքցնում եք, գնորդը չի հարցնում։'],[40.7,42.2,'Գուշակում է ու գնում։']];
-const TURN=23.0,END=44.5;
-// ---------- small vocabulary for this reel ----------
-function swing(t,t0,A=.3,f=1.6,d=.55){const u=Math.max(0,t-t0);return A*Math.exp(-d*u)*Math.sin(u*f*Math.PI*2);}
-function lifted(depth,fn){X.save();X.shadowColor='rgba(11,27,51,.20)';X.shadowBlur=18*depth;X.shadowOffsetX=6*depth;X.shadowOffsetY=14*depth;fn();X.restore();}
-// pseudo-3D tilt of a flat card around its centre (ry: turn left/right, rx: lean back)
+// WiyMood · «Գինը՝ Direct-ով» v2 · ink + riso colour washes, 2.5D. Every spoken line has its own picture.
+// LINES is a placeholder until the voice is recorded; every scene and beat is keyed to LINES, so re-timing = editing LINES.
+const LINES=[[0.05,1.3,'Գինը՝ Direct-ով։'],[1.4,2.5,'Ու ես թերթում եմ։'],[2.7,4.3,'Գին չկա՝ գուշակում եմ։'],[4.4,5.6,'Ու միշտ՝ թանկ։'],
+ [5.9,6.9,'Հարցնե՞մ։'],[7.0,8.2,'Իսկ եթե թանկ է՞։'],[8.3,9.6,'Ինչպե՞ս մերժեմ։'],[9.8,11.7,'Հետո էլ կգրեն՝ «դե, որոշեցի՞ք»։'],[11.9,12.8,'Ջնջում եմ…'],
+ [12.9,15.6,'Ու գնում եմ մրցակցի մոտ, որտեղ գինը գրված է։'],[16.0,19.0,'Իսկ դուք չեք էլ իմանում, որ ես եղել եմ ձեր էջում։'],[19.5,20.4,'Գրեք գինը։'],
+ [20.8,22.0,'Ամեն գրառման տակ։'],[22.4,24.6,'Գնացուցակը՝ Highlights-ում ու կայքում։'],[25.0,27.0,'Պատվեր ու վճարում՝ առանց խոսելու։'],
+ [27.4,29.0,'Direct-ը թողեք անհատական պատվերներին։'],[29.1,30.4,'Պատասխանեք արագ ու գնով։'],[30.8,32.9,'Թաքցնում եք գինը՝ կորցնում եք գնորդին։']];
+const T=i=>LINES[i][0],TE=i=>LINES[i][1],END=35.6,TURN=T(11);
+const PAPER=K.paper,DEEP='#0B1B33',BLUE=K.blue,RED=K.red,GREY=K.grey,TBLUE='#CFE0F5',TRED='#FCD6D1';
+// ---------- colour + depth helpers ----------
+function path(cs,ox=0,oy=0){X.beginPath();cs.forEach(c=>{c.forEach((p,i)=>i?X.lineTo(p[0]+ox,p[1]+oy):X.moveTo(p[0]+ox,p[1]+oy));X.closePath();});}
+function wash(cs,col,a=1,o=8){if(a<=0)return;X.save();X.globalAlpha*=a;X.fillStyle=col;path(cs,o,o);X.fill();X.restore();}
+function shape(cs,o={}){const p=o.prog??1;if(o.fill)wash(cs,o.fill,(o.fa??1)*cl(p*2.5),o.off??8);ink(cs,{w:o.w??5,col:o.line??K.ink,id:o.id,prog:p,dbl:o.dbl,gaps:o.gaps,alpha:o.alpha});}
+function lifted(d,fn){X.save();X.shadowColor='rgba(11,27,51,.24)';X.shadowBlur=20*d;X.shadowOffsetX=8*d;X.shadowOffsetY=16*d;fn();X.restore();}
 function tilt(x,y,s,rx,ry,fn){X.save();X.translate(x,y);X.transform(Math.cos(ry),Math.sin(ry)*.22,-Math.sin(rx)*.22,Math.cos(rx),0,0);X.scale(s,s);fn();X.restore();}
-function cake(x,y,s,p=1,id=3000,col=K.ink){tf(x,y,s,0,()=>{
- ink(Sh.ellipse(0,150,230,34),{w:5,prog:seg(p,0,5),id,col});
- ink(join(Sh.line(-180,140,-180,30),Sh.line(180,30,180,140),Sh.ellipse(0,140,180,24,0,Math.PI,16)),{w:5,prog:seg(p,1,5),id:id+1,col});
- const drip=[[-180,32]];for(let i=0;i<9;i++){const x0=-180+i*40,d=[26,14,34,18,30,12,28,20,24][i];drip.push([x0+8,34],[x0+12,34+d],[x0+20,40+d],[x0+28,34+d],[x0+32,34]);}drip.push([180,32]);ink(Sh.cat(drip,4),{w:4,prog:seg(p,1.5,5),id:id+2,col:K.red});
- ink(join(Sh.line(-120,30,-120,-70),Sh.line(120,-70,120,30),Sh.ellipse(0,-70,120,18)),{w:5,prog:seg(p,2,5),id:id+3,col});
- ink(Sh.ellipse(0,-70,120,18,0,Math.PI,12),{w:4,prog:seg(p,2.5,5),id:id+4,col});
- for(let i=0;i<5;i++)ink(Sh.circle(-80+i*40,-20+(i%2)*14,7),{w:3,prog:seg(p,3,5),id:id+5+i,col:K.red,dbl:0});
- ink(Sh.rrect(-8,-150,16,70,4),{w:4,prog:seg(p,3.5,5),id:id+11,col});
- const fl=seg(p,4,5);if(fl>0){const fk=Math.sin(Ink.BF*1.7)*4;ink(Sh.bez([0,-150],[-22,-170],[fk,-200],[0,-215]),{w:4,prog:fl,id:id+12,col:K.red,dbl:0});ink(Sh.bez([0,-150],[22,-170],[fk,-195],[0,-215]),{w:4,prog:fl,id:id+13,col:K.red,dbl:0});}});}
-function finger(x,y,s,r=0,id=3100){tf(x,y,s,r,()=>{ink(join(Sh.rrect(-34,-10,68,260,34)),{w:5,id});ink(Sh.ellipse(0,18,20,24,Math.PI,Math.PI*2,10),{w:3,id:id+1,dbl:0});ink(join(Sh.line(-34,120,-60,150),Sh.bez([-60,150],[-110,180],[-120,320],[-90,380])),{w:5,id:id+2});ink(Sh.line(-26,90,26,92),{w:2.5,id:id+3,dbl:0,col:K.grey});});}
-function bubble(x,y,w,h,p,id,tail=[-1,1]){tf(x,y,spring(p,.55),0,()=>{const pts=[];const n=14;for(let i=0;i<=n;i++){const a=i/n*Math.PI*2;const k=1+.07*Math.sin(a*7);pts.push([Math.cos(a)*w/2*k,Math.sin(a)*h/2*k]);}ink([pts],{w:4.5,id});ink(join(Sh.circle(tail[0]*w*.32,tail[1]*h*.62,13),Sh.circle(tail[0]*w*.42,tail[1]*h*.85,8)),{w:4,id:id+1});});}
-function phone3d(x,y,s,r,p,fn,id){tf(x,y,s,r,()=>{ink(Sh.rrect(-260+16,-490+18,520,980,64),{w:3,col:K.grey,prog:seg(p,0,1.3),id:id+50,dbl:0,alpha:.55});ink(join(Sh.line(260,-426,276,-408),Sh.line(-196,490,-180,508)),{w:3,col:K.grey,prog:seg(p,.5,1.3),id:id+51,dbl:0,alpha:.55});});lifted(1,()=>phone(x,y,s,r,p,fn,id));}
-function badge(x,y,n,p,id){if(p<=0)return;tf(x,y,spring(p,.5),0,()=>{ink(Sh.circle(0,0,46),{w:6,col:K.blue,id});itxt(String(n),0,4,58,{col:K.blue,id:id+1});});}
-function hand(x,y,s,id=3200){tf(x,y,s,0,()=>{ink(join(Sh.ellipse(0,0,46,36),Sh.bez([-30,-20],[-40,-60],[-10,-70],[0,-36])),{w:5,id});ink(Sh.line(10,30,40,120),{w:5,id:id+1});ink(Sh.line(-20,30,-10,120),{w:5,id:id+2});});}
-function stamp(x,y,s,r,str,col,p,id){if(p<=0)return;tf(x,y,L(1.5,s,E.heavy(cl(p))),r,()=>{const w=Ink.textW(str,44)+70;ink(Sh.rrect(-w/2,-46,w,92,18),{w:6,col,id});ink(Sh.rrect(-w/2+8,-38,w-16,76,14),{w:2.5,col,id:id+1,dbl:0});txt(str,0,2,44,{w:900,col});});}
-function dash(pts,p,id,col=K.grey){ink(Sh.cat(pts,14),{w:4,col,prog:p,id,gaps:.55,dbl:0});}
-// ---------- the price tag (the thread through the reel) ----------
-// drawn hanging from its hole at (0,0); body below. content: '?', 'guess', 'blank', 'price'
-const TAGB=[[-90,64],[-42,8],[42,8],[90,64],[90,296],[-90,296]];const TAGI=[[-74,72],[-34,30],[34,30],[74,72],[74,280],[-74,280]];
-function tagBody(o){const col=o.col||K.red;ink([[...TAGB,TAGB[0]]],{w:6,col,prog:o.prog??1,id:o.id??3300});ink(Sh.circle(0,38,12),{w:4,col,id:(o.id??3300)+1,prog:o.prog??1});ink([[...TAGI,TAGI[0]]],{w:2,col,id:(o.id??3300)+2,gaps:.5,dbl:0,prog:o.prog??1,alpha:.6});
- const ct=o.content||'?';if(ct=='?')itxt('?',0,185,140,{col,id:3310});
- else if(ct=='guess'){const g=o.g||[1,1,1,1,1,1];
-  if(g[0]>0){itxt('15 000 ֏',0,118,36,{prog:g[0],id:3311,maxW:170});if(g[1]>0)ink(Sh.line(-80,110,80,124),{w:5,col:K.red,prog:g[1],id:3312});}
-  if(g[2]>0){itxt('30 000 ֏',0,172,36,{prog:g[2],id:3313,maxW:170});if(g[3]>0)ink(Sh.line(-80,164,80,180),{w:5,col:K.red,prog:g[3],id:3314});}
-  if(g[4]>0){itxt('50 000 ֏',0,234,44,{prog:g[4],id:3315,col:K.red,maxW:150});}
-  if(g[5]>0)itxt('?',0,276,30,{prog:g[5],id:3316,col:K.red});}
- else if(ct=='price'){itxt('12 000 ֏',0,160,48,{prog:o.pp??1,id:3320,col:K.blue,maxW:150});itxt('-ից',0,230,44,{prog:cl(((o.pp??1)-.7)/.3),id:3321,col:K.blue});}}
-function tagAt(x,y,s,ang,len,o={}){tf(x,y,s,ang,()=>{if(len>0)ink(Sh.cat([[0,0],[4,len*.5],[0,len]]),{w:3.5,col:K.ink,id:3330,alpha:o.strA??1,dbl:0});X.translate(0,len);if(o.flip!=null)X.scale(o.flip,1);tagBody(o);});}
-// world state of the tag over time
-function guessProg(t){return [pen(t,3.9,.6),pen(t,4.7,.25),pen(t,5.0,.6),pen(t,5.75,.25),pen(t,6.0,.8),pen(t,6.9,.2)];}
-function drawTag(t){
- if(t<3.25){const a=swing(t,0,.22,1.1,.25)+swing(t,2.35,.35,1.3,.7);tagAt(782,500,.72,a,70,{content:'?'});return;}
- if(t<7.45){const u=E.heavy(P(t,2.88,3.3));const a=swing(t,3.3,.18,.9,.6)*(1-u*.3);tagAt(L(782,1840,u),L(500,180,u),L(.72,2.05,u),a,L(70,60,u),{content:u<.5?'?':'guess',g:guessProg(t)});return;}
- if(t<14.55){const u=E.heavy(P(t,7.05,7.5));const a=swing(t,7.45,.25,1.2,.6)+swing(t,9.0,.12,1.6,.8)+swing(t,12.3,.14,1.8,.9);tagAt(L(1840,3132,u),L(180,545,u),L(2.05,.8,u),a,60,{content:'guess'});return;}
- if(t<19.6){const u=P(t,14.55,19.6),g=u*u*(3-2*u)*.4+u*u*.6;const x=L(3132,4080,u)+Math.sin(u*9)*110*(1-u),y=L(585,3810,g);const a=Math.sin(u*9+1)*.8*(1-u)+L(0,1.32,u*u);
-  tagAt(x,y,.8,a,L(60,0,cl(u*6)),{content:'guess',strA:1-cl(u*6)});if(u<.12)ink(Sh.line(3132,545,3132,585),{w:3.5,id:3331,dbl:0});return;}
- if(t<23.15){tagAt(4080,3810,.8,1.32+swing(t,19.6,.06,2.2,1.4),0,{content:'guess'});return;}
- if(t<24.9){const u=E.heavy(P(t,23.15,23.6));const fl=P(t,23.65,24.0);const flip=Math.cos(fl*Math.PI);const back=fl>.5;
-  tagAt(L(4080,4080,u),L(3810,3100,u),L(.8,1.5,u),L(1.32,0,u)+swing(t,23.6,.08,1.4,1),L(0,140,u),{content:back?'price':'guess',flip:Math.max(.03,Math.abs(flip)),pp:pen(t,24.0,.75)});return;}
- // flies to the first solution card and stays pinned there
- const u=E.heavy(P(t,24.9,25.4));tagAt(L(4080,5585,u),L(3100,2900,u),L(1.5,.85,u),swing(t,25.35,.3,1.4,.7),L(140,50,u),{content:'price'});}
-// ---------- scenes on one sheet ----------
+function solid(x,y,w,h,r,col,a=1){X.save();X.globalAlpha*=a;X.fillStyle=col;X.beginPath();X.roundRect(x,y,w,h,r);X.fill();X.restore();}
+function pill(x,y,str,size,{bg=RED,fg=PAPER,p=1,id=7000,line=null,padX=30}={}){if(p<=0)return;X.font=`900 ${size}px SA`;const w=X.measureText(str).width+padX*2,h=size*1.8;tf(x,y,spring(p,.55),0,()=>{lifted(.5,()=>solid(-w/2,-h/2,w,h,h/2,bg));if(line)ink(Sh.rrect(-w/2,-h/2,w,h,h/2),{w:4,col:line,id,dbl:0});txt(str,0,2,size,{w:900,col:fg});});return w;}
+const swing=(t,t0,A=.3,f=1.4,d=.6)=>{const u=Math.max(0,t-t0);return A*Math.exp(-d*u)*Math.sin(u*f*Math.PI*2);};
+function bubble(x,y,w,h,p,id,tail=[0,1],fill=PAPER,line=K.ink){if(p<=0)return;tf(x,y,spring(cl(p),.55),0,()=>{const pts=[];const n=16;for(let i=0;i<=n;i++){const a=i/n*Math.PI*2;const k=1+.06*Math.sin(a*7);pts.push([Math.cos(a)*w/2*k,Math.sin(a)*h/2*k]);}
+ lifted(.6,()=>{X.save();X.fillStyle=fill;path([pts]);X.fill();X.restore();});ink([pts],{w:4.5,id,col:line});const tc=join(Sh.circle(tail[0]*w*.3,tail[1]*h*.62,13),Sh.circle(tail[0]*w*.4,tail[1]*h*.86,8));wash(tc,fill,1,0);ink(tc,{w:4,id:id+1,col:line});});}
+// ---------- props ----------
+function cake(x,y,s,p=1,id=3000,{line=K.ink,tint=TRED,tiers=2}={}){tf(x,y,s,0,()=>{
+ shape(Sh.ellipse(0,150,230,34),{fill:TBLUE,line,prog:seg(p,0,5),id,w:5});
+ const T1=[[[-180,30],[180,30],[180,140],[-180,140]]];shape(T1,{fill:tint,line,prog:seg(p,1,5),id:id+1});
+ const drip=[[-180,32]];for(let i=0;i<9;i++){const x0=-180+i*40,d=[26,14,34,18,30,12,28,20,24][i];drip.push([x0+8,34],[x0+12,34+d],[x0+20,40+d],[x0+28,34+d],[x0+32,34]);}drip.push([180,32]);ink(Sh.cat(drip,4),{w:4,prog:seg(p,1.5,5),id:id+2,col:RED});
+ shape([[[-120,-70],[120,-70],[120,30],[-120,30]]],{fill:PAPER,line,prog:seg(p,2,5),id:id+3});
+ if(tiers>2)shape([[[-70,-150],[70,-150],[70,-70],[-70,-70]]],{fill:TBLUE,line,prog:seg(p,2.5,5),id:id+20});
+ for(let i=0;i<5;i++)ink(Sh.circle(-80+i*40,-20+(i%2)*14,7),{w:3,prog:seg(p,3,5),id:id+5+i,col:RED,dbl:0});
+ const cy=tiers>2?-150:-70;ink(Sh.rrect(-8,cy-80,16,80,4),{w:4,prog:seg(p,3.5,5),id:id+11,col:line});
+ const fl=seg(p,4,5);if(fl>0){const fk=Math.sin(Ink.BF*1.7)*4;const F=[Sh.bez([0,cy-80],[-22,cy-100],[fk,cy-130],[0,cy-145])[0].concat(Sh.bez([0,cy-145],[fk,cy-125],[22,cy-100],[0,cy-80])[0])];wash(F,'#FFB23F',1,0);ink(F,{w:4,prog:fl,id:id+12,col:RED,dbl:0});}});}
+function phone(x,y,s,r,p,fn,{id=6000,body=DEEP,line=K.ink,screen=PAPER}={}){tf(x,y,s,r,()=>{const a=cl(p*2.2);
+ X.save();X.globalAlpha*=a;lifted(1.2,()=>solid(-262,-492,524,984,66,body));solid(-238,-446,476,892,34,screen);solid(-60,-478,120,22,11,'#22324d');X.restore();
+ ink(Sh.rrect(-262,-492,524,984,66),{w:5,col:line,prog:seg(p,0,1.3),id});
+ if(p>.45){X.save();X.translate(-230,-430);X.beginPath();X.rect(-8,-16,476,892);X.clip();BOX=X.getTransform().inverse();fn(460,860);BOX=null;X.restore();}});}
+function tagShape(o){const col=o.col||RED,fill=o.fill??PAPER;const B=[[-90,64],[-42,8],[42,8],[90,64],[90,296],[-90,296]];
+ lifted(.7,()=>{X.save();X.fillStyle=fill;path([B]);X.fill();X.restore();});wash([B],TRED,.9,10);X.save();X.fillStyle=fill;path([B]);X.fill();X.restore();
+ ink([[...B,B[0]]],{w:6,col,id:o.id??3300});ink(Sh.circle(0,38,12),{w:4,col,id:(o.id??3300)+1});
+ const I=[[-74,72],[-34,30],[34,30],[74,72],[74,280],[-74,280]];ink([[...I,I[0]]],{w:2,col,id:(o.id??3300)+2,gaps:.5,dbl:0,alpha:.6});if(o.inner)o.inner();}
+function tag(x,y,s,ang,len,inner,o={}){tf(x,y,s,ang,()=>{if(len>0)ink(Sh.cat([[0,0],[5,len*.5],[0,len]]),{w:3.5,col:o.str||K.ink,id:3330,dbl:0});X.translate(0,len);if(o.flip!=null)X.scale(Math.max(.03,Math.abs(o.flip)),1);tagShape({inner,col:o.col,fill:o.fill});});}
+function finger(x,y,s,r=0,id=3100,col=K.ink,fill=PAPER){tf(x,y,s,r,()=>{const F=Sh.rrect(-34,-10,68,300,34);wash(F,fill,1,0);ink(F,{w:5,id,col});ink(Sh.ellipse(0,18,20,24,Math.PI,Math.PI*2,10),{w:3,id:id+1,dbl:0,col});});}
+function dash(pts,p,id,col=GREY){ink(Sh.cat(pts,14),{w:4,col,prog:p,id,gaps:.55,dbl:0});}
+function walker(x,y,r,o){const b=Math.abs(Math.sin((o.t||0)*9))*10;face(x,y-b,r,{...o,prog:1});}
+function wallet(x,y,s,open,id){tf(x,y,s,0,()=>{const B=Sh.rrect(-110,-70,220,140,18);shape(B,{fill:TBLUE,id,w:5});tf(0,-70,1,0,()=>{X.save();X.scale(1,Math.cos(open*2.6));shape(Sh.rrect(-110,-60,220,60,14),{fill:BLUE,fa:.7,id:id+1,w:4});X.restore();});ink(Sh.circle(80,0,10),{w:3,id:id+2});});}
+function moth(x,y,s,t,id){tf(x,y,s,Math.sin(t*6)*.2,()=>{const fl=Math.abs(Math.sin(t*22));ink(join(Sh.ellipse(-26,0,26,18*fl+4),Sh.ellipse(26,0,26,18*fl+4),Sh.line(0,-14,0,16),Sh.line(0,-14,-10,-30),Sh.line(0,-14,10,-30)),{w:3,id,dbl:0,col:GREY});});}
+function stamp(x,y,s,r,str,p,{bg=BLUE,fg=PAPER,id=3850}={}){if(p<=0)return;tf(x,y,L(1.6,s,E.heavy(cl(p))),r,()=>{X.font='900 44px SA';const w=X.measureText(str).width+80;lifted(.8,()=>solid(-w/2,-50,w,100,22,bg));ink(Sh.rrect(-w/2+10,-40,w-20,80,16),{w:2.5,col:fg,id,dbl:0});txt(str,0,2,44,{w:900,col:fg});});}
+function stopwatch(x,y,s,sec,p,id,col=PAPER){tf(x,y,s,0,()=>{const C=Sh.circle(0,0,90);wash(C,PAPER,1,0);ink(C,{w:6,col:K.ink,id,prog:p});ink(Sh.rrect(-20,-122,40,26,6),{w:5,id:id+1,prog:p});const a=-Math.PI/2+sec/60*Math.PI*2;ink(Sh.line(0,0,Math.cos(a)*68,Math.sin(a)*68),{w:6,col:RED,id:id+2,dbl:0});txt('0:'+String(Math.floor(sec)).padStart(2,'0'),0,140,52,{w:900,col,f:'MO'});});}
+// ---------- background regions on the one sheet ----------
+function rough(x0,y0,x1,y1,seed){const pts=[];let s=seed;const R=()=>{s=(s*16807)%2147483647;return s/2147483647;};const n=40;
+ for(let i=0;i<=n;i++)pts.push([L(x0,x1,i/n),y0+(R()-.5)*30]);for(let i=0;i<=n;i++)pts.push([x1+(R()-.5)*30,L(y0,y1,i/n)]);for(let i=n;i>=0;i--)pts.push([L(x0,x1,i/n),y1+(R()-.5)*30]);for(let i=n;i>=0;i--)pts.push([x0+(R()-.5)*30,L(y0,y1,i/n)]);return [pts];}
+const DARK=rough(3150,2080,5720,4600,3),BLUEZ=rough(5600,2080,12460,4600,9);
+let BURST={x:5340,y:3220};
+function regions(t){X.save();X.fillStyle=DEEP;path(DARK);X.fill();
+ const r=E.heavy(P(t,T(11)+.75,T(11)+1.45))*2900;X.fillStyle=BLUE;if(r>0){X.save();path(DARK);X.clip();X.beginPath();X.arc(BURST.x,BURST.y,r,0,7);X.fill();X.restore();}
+ path(BLUEZ);X.fill();X.restore();}
+// ---------- scenes ----------
 const SC=[];function scene(t0,t1,x,y,fn){SC.push({t0,t1,x,y,fn});}
-const POST={h:'qo_tortery'};
-function postUI(lt,w,h,{scroll=0,priced=false}={}){X.save();X.beginPath();X.rect(0,0,w,h);X.clip();X.translate(0,-scroll);
- ink(Sh.circle(40,42,24),{w:4,id:3400});txt('🎂',40,44,22,{w:800});txt(POST.h,76,42,28,{al:'left',f:'MO',w:800});txt('•••',w-34,40,26,{w:900,col:K.grey});
- ink(Sh.rect(0,82,w,430),{w:3,id:3401,col:K.grey,dbl:0});cake(w/2,310,.82,1,3410);
- heart(36,560,.42,1,K.red,3420);ink(Sh.ellipse(96,552,22,20),{w:4,id:3421});ink(Sh.poly([[136,535],[174,552],[136,569],[146,552]],true),{w:4,id:3422});ink(Sh.poly([[w-46,532],[w-20,532],[w-20,572],[w-33,560],[w-46,572]],true),{w:4,id:3423});
- txt('Ծննդյան տորթ, ձեռքի աշխատանք',16,612,25,{al:'left',w:600,maxW:w-30});
- if(priced){txt('12 000 ֏-ից · Պատվիրել ↗',16,662,32,{al:'left',w:900,col:K.blue,maxW:w-30});}
- else{txt('Գինը՝ Direct-ով',16,664,38,{al:'left',w:900,maxW:w-30});ink(Sh.cat([[14,690],[150,694],[290,688]]),{w:5,col:K.red,id:3424,dbl:.2});}
- txt('Մեկնաբանություններ (14)',16,726,22,{al:'left',w:600,col:K.grey,maxW:w-30});
- txt('anna_k   Գինը՞',16,764,24,{al:'left',w:700,maxW:w-30});txt(POST.h+'   Direct-ում ✉',16,800,24,{al:'left',w:700,col:K.grey,maxW:w-30});
- // next post below (scrolled into view)
- ink(Sh.circle(40,902,24),{w:4,id:3430,col:K.grey});txt('kitten.daily',76,902,26,{al:'left',f:'MO',w:800,col:K.grey});ink(Sh.rect(0,940,w,430),{w:3,id:3431,col:K.grey,dbl:0});
- tf(w/2,1160,1,0,()=>{ink(join(Sh.ellipse(0,40,120,70),Sh.poly([[-90,0],[-70,-80],[-40,-20]]),Sh.poly([[40,-20],[70,-80],[90,0]])),{w:4,id:3432,col:K.grey});});
- X.restore();}
-// S1 hook: the post, the caption everyone knows
-scene(0,3.3,0,0,(lt)=>{
- itxt('Գինը՝ Direct-ով։',540,300,104,{id:3500,maxW:820});ink(Sh.cat([[150,380],[540,392],[930,376]]),{w:7,col:K.red,id:3501,dbl:.25});
- const sc=E.heavy(P(lt,2.3,2.9))*560;
- phone3d(540,965,.92,-.035,1,(w,h)=>postUI(lt,w,h,{scroll:sc}),3510);
- const fin=E.land(P(lt,1.4,1.9)),sw=E.heavy(P(lt,2.25,2.85));if(fin>0)tf(0,0,1,0,()=>finger(L(980,760,fin),L(1900,1180,fin)-sw*420,1,-.18,3520));
- if(sw>0&&sw<1)arrow([[860,1260],[880,1060],[900,860]],P(lt,2.25,2.6),K.grey,3530,4);});
-// S2 the guess
-scene(3.3,7.4,1300,-200,(lt)=>{const t=lt+3.0;const wow=t>6.1;
- face(250,1220,96,{id:3600,mood:wow?'wow':'flat',look:1,prog:pen(lt,.1,.6)});
- [[330,1085,10],[300,1030,15],[285,960,21]].forEach(([x,y,r],i)=>ink(Sh.circle(x,y,r),{w:4,id:3610+i,prog:pen(lt,.5+i*.12,.2)}));
- [[150,380,.8],[880,560,1.1],[880,1180,.7],[170,760,.9]].forEach(([x,y,s],i)=>{const p=pen(lt,.3+i*.25,.4);if(p>0)tf(x,y+Math.sin(lt*2+i)*8,s,(i%2?.2:-.2),()=>itxt('?',0,0,90,{prog:p,id:3620+i,col:i==1?K.red:K.grey}));});
- if(wow)tf(870,350,1,.15,()=>{const p=pen(t,6.1,.3);itxt('ու՜ֆ',0,0,64,{prog:p,id:3630,col:K.red});});});
-// S3 the awkward DM
-function dmUI(lt,w,h,{draft=true}={}){ink(Sh.circle(40,42,24),{w:4,id:3700});txt('🎂',40,44,22,{w:800});txt(POST.h,76,32,28,{al:'left',f:'MO',w:800});txt('առցանց էր 2 օր առաջ',76,62,20,{al:'left',w:600,col:K.grey});
- ink(Sh.line(0,86,w,86),{w:3,id:3701,col:K.grey,dbl:0});if(!draft)return;txt('Սկսեք զրույցը',w/2,380,26,{w:600,col:K.grey});
- const t=lt+7.1;const msg='Բարև, գինը՞';let n=0;if(t<9.0)n=Math.floor(cl((t-7.8)/1.0)*msg.length);else n=Math.max(0,msg.length-Math.floor(cl((t-9.05)/.45)*msg.length));
- ink(Sh.rrect(14,h-110,w-28,70,35),{w:4,id:3702});const s=[...msg].slice(0,n).join('');const tw=txt(s,40,h-75,30,{al:'left',w:700,maxW:w-120});if(Math.floor(t*3)%2==0)ink(Sh.line(44+tw,h-95,44+tw,h-55),{w:3,id:3703,dbl:0});
- if(t>9.45)txt('Սևագիր (3)',w-30,h-136,22,{al:'right',w:800,col:K.red});}
-scene(7.4,14.5,2600,100,(lt)=>{const t=lt+7.1;
- phone3d(330,830,.8,-.03,pen(lt,0,.5),(w,h)=>dmUI(lt,w,h),3720);
- const b1=P(t,9.2,9.6),b2=P(t,10.8,11.2),b3=P(t,12.2,12.6);
- if(b1>0)lifted(.6,()=>{bubble(790,330,440,180,b1,3730,[-.3,1]);txt('Իսկ եթե թանկ լինի՞',790,330,36,{w:800,maxW:380,a:b1});});
- if(b2>0)lifted(.6,()=>{bubble(810,640,360,160,b2,3740,[-.2,1]);txt('Ինչպե՞ս մերժեմ',810,640,36,{w:800,maxW:300,a:b2});});
- if(b3>0)lifted(.6,()=>{bubble(770,960,500,200,b3,3750,[.2,1]);txt('Հետո էլ կգրեն՝',770,918,26,{w:600,col:K.grey,a:b3});txt('«դե, որոշեցի՞ք»',770,970,42,{w:900,col:K.red,maxW:430,a:b3});
-  if(WIY.complete&&b3>.6){X.save();X.translate(1000,880);X.rotate(.25);X.globalAlpha=cl((b3-.6)/.4);X.drawImage(WIY,-42,-42,84,84*WIY.height/WIY.width);X.restore();}});
- face(860,1260,76,{id:3760,mood:t>9.2?'frown':'flat',look:-1,prog:pen(lt,.3,.5)});if(t>9.3){const d=(t*1.3)%1;ink(Sh.bez([940,1190],[952,1210+d*30],[932,1230+d*30],[940,1210+d*30]),{w:4,col:K.blue,id:3765,alpha:1-d,dbl:0});}});
-// S4 the competitor: the price is written
-scene(14.5,18.4,3900,-150,(lt)=>{const t=lt+14.2;
- shop(540,520,1.25,{name:'Գինը գրված է',mood:'happy',awn:K.blue,prog:pen(lt,0,.6),id:3800});
- lifted(1,()=>tilt(540,1010,1,.05,-.06,()=>{ink(Sh.rrect(-390,-210,780,420,36),{w:6,id:3810,prog:pen(lt,.1,.4)});cake(-210,30,.62,pen(lt,.3,.6),3820);
-  txt('Ծննդյան տորթ',40,-120,36,{al:'left',w:800,maxW:330});itxt('12 000 ֏',40+150,-30,78,{id:3830,col:K.blue,prog:pen(lt,.5,.5),maxW:320});
-  const tap=P(t,15.9,16.1);tf(190,110,1-tap*.08+tap*tap*.08,0,()=>{ink(Sh.rrect(-150,-44,300,88,44),{w:6,col:K.blue,id:3831,prog:pen(lt,.7,.3)});txt('Պատվիրել',0,2,36,{w:900,col:K.blue,a:pen(lt,.8,.2)});});}));
- const fin=E.land(P(t,15.2,15.8));if(fin>0&&t<16.6)finger(L(1000,735,fin),L(1900,1150,fin)+(t>15.9?-Math.sin(P(t,15.9,16.15)*Math.PI)*20:0),.9,-.15,3840);
- stamp(600,1290,.95,-.06,'Պատվերն ընդունված է ✓',K.blue,P(t,16.3,16.6),3850);
- face(130,1330,58,{id:3860,mood:t>16.4?'happy':'smile',prog:pen(lt,.4,.5)});});
-// S5 the owner, who never knew (the turn)
-scene(18.4,24.9,3300,2500,(lt)=>{const t=lt+18.1;
- // the shop: wall shelf, counter, the owner behind it
- ink(Sh.line(30,1360,1050,1372),{w:5,id:3900});ink(join(Sh.line(60,1080,640,1080),Sh.line(60,1080,60,1360),Sh.line(640,1080,640,1360),Sh.line(60,1130,640,1130)),{w:5,id:3901,prog:pen(lt,.1,.5)});
- ink(Sh.line(80,700,520,700),{w:4,id:3902,prog:pen(lt,.2,.4)});cake(170,640,.3,pen(lt,.3,.5),3950);cake(400,640,.3,pen(lt,.35,.5),3960);
- face(350,930,96,{id:3910,mood:'sad',look:Math.sin(t*1.3)>.6?-1:1,blink:(t%2.7)<.12,prog:pen(lt,.2,.6)});clock(560,780,60,t*2.2,pen(lt,.4,.5),3970);
- tf(500,1040,.9,.3,()=>{ink(Sh.rrect(-40,-70,80,140,14),{w:5,id:3915});});
- // the empty Direct, lifted off the page
- const zf=1-P(t,22.4,22.9);if(zf>0)lifted(.9,()=>tilt(720,420,.92,.05,.07,()=>{const p=pen(lt,.5,.4)*zf;ink(Sh.rrect(-300,-150,600,300,30),{w:5,id:3930,prog:p});txt('Direct',-260,-100,36,{al:'left',f:'MO',w:800,a:p});
-  tf(-260,-38,1+.06*Math.max(0,Math.sin(t*4)),0,()=>txt('0 նոր հաղորդագրություն',0,0,34,{al:'left',w:900,col:K.red,maxW:540,a:p}));ink(Sh.line(-270,4,270,4),{w:2.5,id:3931,col:K.grey,dbl:0,prog:p});
-  txt('Սպամ · «Դուք շահել եք iPhone»',-260,52,26,{al:'left',w:600,col:K.grey,maxW:540,a:p});txt('Ուրիշ ոչինչ',-260,98,26,{al:'left',w:600,col:K.grey,a:p});}));
- // the sign (easter egg) on the wall
- if(zf>0)tf(250,540,.95,-.04,()=>{const p=pen(lt,.6,.4)*zf;ink(Sh.line(-60,-74,0,-130),{w:3,id:3921,dbl:0,prog:p});ink(Sh.line(60,-74,0,-130),{w:3,id:3922,dbl:0,prog:p});ink(Sh.rrect(-170,-74,340,148,14),{w:4,id:3920,prog:p});txt2('Գինը՝ ըստ|տրամադրության',0,0,30,{w:900,col:K.red,maxW:300,a:pen(lt,.8,.3)*zf});});
- // the buyer was here: dashed ghost footsteps in and out
- const gp=pen(t,19.6,1.6);const gfade=1-cl((t-22.4)/.6);if(gfade>0){X.save();X.globalAlpha*=gfade;dash([[1060,1250],[900,1220],[770,1200],[800,1150],[930,1130],[1080,1110]],gp,3940);X.restore();}
- if(t>19.8&&t<23.2){const ga=cl((t-19.8)/.4)*(1-cl((t-21.6)/1.2));ink(Sh.circle(880,1030,52),{w:4,id:3945,col:K.grey,gaps:.55,dbl:0,alpha:ga});txt('ես',880,1030,30,{w:800,col:K.grey,a:ga});}});
-// S6–S9 the four fixes, one row on the sheet
-function title(n,str,lt,id){badge(140,300,n,P(lt,0,.35),id);const a=pen(lt,.15,.4);X.save();X.translate(L(-30,0,E.outExpo(a)),0);txt(str,210,300,52,{al:'left',w:900,maxW:780,a});X.restore();ink(Sh.cat([[210,345],[500,350],[760,342]]),{w:5,col:K.blue,prog:pen(lt,.4,.5),id:id+4,dbl:.2});}
-scene(24.9,28.4,4700,2400,(lt)=>{title(1,'Գինը՝ գրառման տակ',lt,4000);
- lifted(1,()=>tilt(540,960,1,.04,.07,()=>{ink(Sh.rrect(-330,-470,660,940,40),{w:6,id:4010,prog:pen(lt,0,.4)});X.save();X.translate(-300,-440);postUI(lt,600,860,{priced:true});X.restore();}));
- const hl=pen(lt,.9,.5);ink(Sh.ellipse(500,1182,330,52,-.04,Math.PI*2-.2),{w:5,col:K.blue,prog:hl,id:4020});});
-scene(28.4,31.7,6000,2550,(lt)=>{title(2,'Գնացուցակ',lt,4100);
- lifted(.8,()=>{tf(330,720,1,-.03,()=>{ink(Sh.circle(-150,0,70),{w:5,id:4110,prog:pen(lt,.1,.3)});txt('🎂',-150,2,56,{w:800});txt(POST.h,-50,-30,32,{al:'left',f:'MO',w:800});txt('Տորթեր պատվերով',-50,10,26,{al:'left',w:600,col:K.grey});txt('qo-tortery.am/գներ',-50,50,26,{al:'left',w:800,col:K.blue});
-  ['Գներ','Մենյու','Առաքում'].forEach((s,i)=>{const x=-150+i*170,y=200;const on=i==0;ink(Sh.circle(x,y,58),{w:on?7:4,col:on?K.red:K.ink,id:4120+i,prog:pen(lt,.3+i*.12,.3)});txt(s,x,y+92,26,{w:800,col:on?K.red:K.ink});});});});
- arrow([[200,1010],[260,1120],[380,1180]],pen(lt,.9,.4),K.red,4130,5);
- lifted(1,()=>tilt(660,1210,1,.03,-.06,()=>{const p=pen(lt,1.1,.4);ink(Sh.rrect(-300,-190,600,380,26),{w:5,id:4140,prog:p});itxt('Գներ',0,-130,50,{id:4141,prog:pen(lt,1.3,.4)});
-  [['Ծննդյան տորթ','12 000 ֏-ից'],['Մինի տորթ','6 000 ֏'],['Կապքեյք ×6','4 500 ֏']].forEach(([a,b],i)=>{const y=-40+i*70;const r=pen(lt,1.5+i*.2,.3);txt(a,-260,y,30,{al:'left',w:700,a:r});txt(b,260,y,30,{al:'right',w:900,col:K.blue,a:r});dash([[-30,y+4],[110,y+4]],r,4150+i,K.grey);});}));});
-scene(31.7,34.5,7300,2400,(lt)=>{title(3,'Պատվեր առանց խոսելու',lt,4200);const t=lt+31.4;
- const steps=[['Պատվիրել',K.blue],['Վճարել քարտով',K.ink],['Վճարված ✓',K.blue]];
- steps.forEach(([s,col],i)=>{const p=E.land(P(t,32.0+i*.55,32.4+i*.55));if(p<=0)return;const x=540,y=620+i*250;lifted(.7,()=>tf(x,L(y+120,y,p),1,(i-1)*.03,()=>{ink(Sh.rrect(-260,-70,520,140,70),{w:6,col,id:4210+i});txt(s,0,2,44,{w:900,col,maxW:460});}));if(i<2)arrow([[x,y+80],[x+14,y+120],[x,y+170]],P(t,32.3+i*.55,32.5+i*.55),K.grey,4220+i,4);});
- face(870,1290,64,{id:4230,mood:t>33.4?'happy':'smile',prog:pen(lt,.3,.5)});
- if(t>33.0)tf(560,1300,1,0,()=>{const p=pen(t,33.0,.4);ink(Sh.rrect(-130,-36,260,72,30),{w:3.5,id:4240,col:K.grey,prog:p,dbl:0});txt('ո՛չ զանգ, ո՛չ նամակ',0,0,22,{w:800,col:K.grey,a:p});});});
-scene(34.5,38.1,8600,2550,(lt)=>{title(4,'Direct՝ անհատական պատվերի համար',lt,4300);const t=lt+34.2;
- phone3d(500,930,.95,.03,pen(lt,0,.45),(w,h)=>{dmUI(lt,w,h,{draft:false});
-  const m1=E.land(P(t,35.0,35.35));if(m1>0)tf(0,L(60,0,m1),1,0,()=>{ink(Sh.rrect(16,150,w-90,120,30),{w:4,id:4310});txt2('Կարո՞ղ եք եռահարկ տորթ|պատրաստել շաբաթ օրը։',30+((w-90)/2)-10,210,24,{w:700,maxW:w-120});});
-  const m2=E.land(P(t,35.9,36.25));if(m2>0)tf(0,L(60,0,m2),1,0,()=>{ink(Sh.rrect(70,300,w-86,150,30),{w:5,col:K.blue,id:4311});txt('Այո՛։ 45 000 ֏-ից։',90,345,28,{al:'left',w:900,col:K.blue,maxW:w-130});txt('Պատվիրել՝ qo-tortery.am',90,395,24,{al:'left',w:700,col:K.blue,maxW:w-130});});},4320);
- const sw=pen(lt,.6,.4);if(sw>0)tf(890,560,1,0,()=>{clock(0,-60,56,lt*6,sw,4330,K.blue);itxt('0:40',0,60,52,{id:4340,col:K.blue,maxW:160});});
- const cp=P(t,36.6,36.9);if(cp>0)tf(880,1250,1,.05,()=>{ink(Sh.rrect(-150,-40,300,80,30),{w:4,id:4350,col:K.grey,dbl:0});txt('Դե, որոշեցի՞ք',0,0,30,{w:800,col:K.grey,maxW:270});cross(0,0,2.6,P(t,36.9,37.3),K.red,4351);});});
-// S10 end: the tag under our logo, one line, one send
 let LOGO=new Image();LOGO.src='logo.png';let WIY=new Image();WIY.src='wiy.png';
-scene(38.1,END,9900,2400,(lt)=>{const t=lt+37.8;
- const lg=spring(P(t,37.95,38.5),.65);if(lg>0&&LOGO.complete)tf(540,520,lg,0,()=>{const lw=330,lh=lw*LOGO.height/LOGO.width;X.save();X.globalCompositeOperation='multiply';X.drawImage(LOGO,-lw/2,-lh/2,lw,lh);X.restore();});
- const tg=E.land(P(t,38.15,38.75));if(tg>0)lifted(1,()=>tagAt(540,L(560,700,tg),.95,swing(t,38.75,.25,1.1,.4),70,{content:'price'}));
- const sp=P(t,42.2,42.6);if(sp>0)lifted(.7,()=>tf(540,1180,spring(sp,.6),0,()=>{ink(Sh.rrect(-430,-110,860,220,40),{w:6,id:4410,col:K.blue});
-  ink(Sh.poly([[-370,-30],[-310,-2],[-370,26],[-356,-2]],true),{w:5,id:4411,col:K.blue});txt('Ուղարկեք մի բիզնեսի,',-300,-30,38,{al:'left',w:900,maxW:680});txt('որ դեռ գրում է «գինը՝ Direct-ով»',-300,26,34,{al:'left',w:800,col:K.red,maxW:680});}));
- if(WIY.complete&&t>40.0){const u=E.land(P(t,40.0,40.6));X.save();X.translate(L(1180,930,u),1000);X.rotate(-.18);X.drawImage(WIY,-70,-70,140,140*WIY.height/WIY.width);X.restore();}
- itxt('wiymood',540,1420,70,{fam:'S',prog:pen(t,42.7,.8),id:4420,col:K.blue,maxW:500});});
+function postsUI(t,w,h,scroll){X.save();X.translate(0,-scroll);
+ const P0=[['qo_tortery','🎂',(x,y)=>cake(x,y,.82,1,3410)],['kitten.daily','🐱',(x,y)=>{ink(join(Sh.ellipse(x,y+40,120,70),Sh.poly([[x-90,y],[x-70,y-80],[x-40,y-20]]),Sh.poly([[x+40,y-20],[x+70,y-80],[x+90,y]])),{w:4,id:3432});}],
+  ['shoes.yerevan','👟',(x,y)=>{shape(Sh.cat([[x-150,y+40],[x-140,y-40],[x-40,y-50],[x+20,y-10],[x+150,y+10],[x+150,y+50],[x-150,y+50]]),{fill:TBLUE,id:3440});}],['coffee.daily','☕',(x,y)=>{shape(Sh.rrect(x-90,y-60,160,150,20),{fill:TRED,id:3450});ink(Sh.ellipse(x+80,y+10,40,40,-1.5,1.5),{w:5,id:3451});}]];
+ P0.forEach((p,i)=>{const oy=i*900;ink(Sh.circle(40,oy+42,24),{w:4,id:3400+i*20});txt(p[1],40,oy+44,22,{w:800});txt(p[0],76,oy+42,26,{al:'left',f:'MO',w:800});
+  solid(0,oy+82,w,430,0,i%2?'#EEF3FA':'#FBF3F1');p[2](w/2,oy+310);
+  if(i==0){heart(36,560,.42,1,RED,3420);txt('Ծննդյան տորթ, ձեռքի աշխատանք',16,614,24,{al:'left',w:600,maxW:w-30});
+   X.save();X.globalAlpha=.85;X.fillStyle='#FFE08A';X.fillRect(10,642,300,48);X.restore();txt('Գինը՝ Direct-ով',18,666,38,{al:'left',w:900,maxW:w-30});
+   txt('anna_k   Գինը՞',16,726,24,{al:'left',w:700});txt('qo_tortery   Direct-ում ✉',16,762,24,{al:'left',w:700,col:GREY});}
+  else txt(['','Գինը՝ Direct-ով','Գինը՝ Direct-ով','Գինը՝ Direct-ով'][i],16,oy+620,30,{al:'left',w:800,col:GREY});});X.restore();}
+// S0 hook + scroll
+scene(0,T(2)-.35,0,0,(t)=>{
+ X.save();X.globalAlpha=.9;X.fillStyle='#FFE08A';X.beginPath();X.roundRect(120,240,840,120,20);X.fill();X.restore();
+ itxt('Գինը՝ Direct-ով։',540,300,104,{id:3500,maxW:800});
+ const sc=E.io(P(t,T(1)+.1,TE(1)))*2700;
+ phone(540,1000,.9,-.035,1,(w,h)=>postsUI(t,w,h,sc),{id:3510});
+ if(sc>40&&sc<2650){X.save();X.globalAlpha=.35*Math.sin(Math.PI*sc/2700);for(let i=0;i<8;i++)ink(Sh.line(330+i*55,700,330+i*55,1300),{w:3,col:GREY,id:3560+i,dbl:0});X.restore();}
+ const fin=E.land(P(t,T(1)-.4,T(1)));if(fin>0)finger(L(980,760,fin),L(1900,1180,fin)-E.heavy(P(t,T(1)+.1,T(1)+.6))*420,1,-.18,3520);
+ tag(790,520,.7,swing(t,0,.22,1.1,.25)+swing(t,T(1)+.1,.4,1.3,.7),60,()=>itxt('?',0,185,140,{col:RED,id:3310}));});
+// S1 the guess: slot machine, lands on «թանկ»
+const GUESS=['8 000','15 000','22 000','30 000','40 000','50 000'];
+scene(T(2)-.35,T(4)-.35,1300,-150,(t)=>{const land=P(t,T(2)+.2,T(3));const roll=(1-Math.pow(1-land,3))*(GUESS.length-1+6*0)+0;const heavy=E.heavy(P(t,T(3),T(3)+.35));
+ face(250,1240,96,{id:3600,mood:t>T(3)?'wow':'flat',look:1,prog:pen(t-T(2)+.35,.1,.5)});
+ [[330,1100,10],[300,1050,15],[285,985,21]].forEach(([x,y,r],i)=>ink(Sh.circle(x,y,r),{w:4,id:3610+i,prog:pen(t,T(2)+i*.1,.2)}));
+ const drop=t>T(3)?E.land(P(t,T(3),T(3)+.4))*60:0;
+ tag(560,200+drop,2.05,swing(t,T(3),.12,1.8,1.2),70,()=>{
+  X.save();X.beginPath();X.rect(-80,110,160,140);X.clip();const k=Math.min(GUESS.length-1,roll*(GUESS.length-1)),i0=Math.floor(k),f=k-i0;
+  for(let j=-1;j<=1;j++){const idx=i0+j;if(idx<0||idx>=GUESS.length)continue;const y=180+(j-f)*70;const last=idx==GUESS.length-1&&land>=1;txt(GUESS[idx]+' ֏',0,y,last?40:34,{w:900,col:last?RED:K.ink,maxW:150,a:1-Math.abs(j-f)*.6});}X.restore();
+  ink(join(Sh.line(-80,140,80,140),Sh.line(-80,220,80,220)),{w:2,col:GREY,id:3317,dbl:0,alpha:.6});});
+ if(heavy>0){[[860,360],[880,700],[180,520],[860,1050]].forEach(([x,y],i)=>tf(x,y-heavy*60,1+heavy*.2,.2*(i%2?1:-1),()=>txt('֏',0,0,70,{w:900,col:RED,a:heavy*(1-P(t,T(3)+.6,TE(3)+.2))})));
+  tf(560,1060,1,0,()=>{X.save();X.globalAlpha=heavy*.9;X.fillStyle=RED;X.beginPath();X.roundRect(-150,-40,300,80,40);X.fill();X.restore();txt('ԹԱՆԿ',0,2,48,{w:900,col:PAPER,a:heavy});});}});
+// S2 the DM: ask? what if it's expensive? how to say no? the pushing. delete.
+function dmUI(t,w,h){ink(Sh.circle(40,42,24),{w:4,id:3700});txt('🎂',40,44,22,{w:800});txt('qo_tortery',76,32,28,{al:'left',f:'MO',w:800});txt('առցանց էր 2 օր առաջ',76,62,20,{al:'left',w:600,col:GREY});ink(Sh.line(0,86,w,86),{w:3,id:3701,col:GREY,dbl:0});
+ solid(100,120,w-130,170,22,'#F1F4F9');cake(170,215,.22,1,3710);txt('Ծննդյան տորթ',240,175,22,{al:'left',w:800});txt('Գինը՝ Direct-ով',240,215,22,{al:'left',w:700,col:GREY});
+ const msg='Բարև, գինը՞';let n=0;if(t<T(8))n=Math.floor(cl((t-T(4)-.15)/.8)*msg.length);else n=Math.max(0,msg.length-Math.floor(cl((t-T(8))/.45)*msg.length));
+ solid(14,h-110,w-28,70,35,'#EEF2F8');ink(Sh.rrect(14,h-110,w-28,70,35),{w:3,id:3702,dbl:0});const s=[...msg].slice(0,n).join('');const tw=txt(s,40,h-75,30,{al:'left',w:700,maxW:w-120});if(Math.floor(t*3)%2==0&&t>T(4))ink(Sh.line(44+tw,h-95,44+tw,h-55),{w:3,id:3703,dbl:0});
+ if(t>T(8)+.45)txt('Սևագիր (3)',w-30,h-136,22,{al:'right',w:800,col:RED});
+ // the push notifications (L7)
+ ['Դե՞','Որոշեցի՞ք','??','Զեղչ անե՞նք 🙂'].forEach((m,i)=>{const p=E.land(P(t,T(7)+.1+i*.35,T(7)+.4+i*.35));const out=E.heavy(P(t,T(8),T(8)+.4));if(p<=0)return;const y=L(-90,300+i*92,p)-out*900;
+  lifted(.5,()=>solid(18,y,w-36,80,20,i==3?'#FFE08A':TRED));txt('qo_tortery',38,y+24,18,{al:'left',f:'MO',w:800,col:GREY});txt(m,38,y+54,30,{al:'left',w:900,col:i==3?K.ink:RED});});}
+scene(T(4)-.35,T(9)-.35,2600,0,(t)=>{const out=E.heavy(P(t,T(8)+.3,TE(8)));
+ phone(640,900,.82,-.03+out*.1,1,(w,h)=>dmUI(t,w,h),{id:3720});
+ // L5 wallet with a moth
+ const b1=P(t,T(5),T(5)+.35)*(1-P(t,T(8),T(8)+.3));bubble(285,440,360,290,b1,3730,[.5,1]);if(b1>.6){wallet(285,455,.9,P(t,T(5)+.3,T(5)+.7),3735);const m=P(t,T(5)+.6,TE(5)+1.6);if(m>0&&m<1)moth(285+Math.sin(m*9)*60,420-m*260,1,t,3738);txt('թանկ է՞',285,565,30,{w:900,col:RED});}
+ // L6 «Ոչ» runs away
+ const b2=P(t,T(6),T(6)+.35)*(1-P(t,T(8),T(8)+.3));bubble(285,860,370,230,b2,3740,[.4,1]);if(b2>.6){pill(205,860,'Այո',34,{bg:BLUE,id:3741,padX:22});const run=P(t,T(6)+.4,TE(6));const nx=315+Math.sin(run*14)*40*run+run*40,ny=860+Math.cos(run*11)*30*run;pill(nx,ny,'Ոչ',34,{bg:PAPER,fg:K.ink,line:K.ink,id:3742,padX:22});if(run>.2)txt('ո՞նց ասեմ…',285,955,24,{w:700,col:GREY});}
+ face(220,1290,72,{id:3760,mood:t>T(5)?'frown':'flat',look:1,prog:1});if(t>T(5)){const d=(t*1.3)%1;ink(Sh.bez([290,1230],[302,1250+d*30],[282,1270+d*30],[290,1250+d*30]),{w:4,col:BLUE,id:3765,alpha:1-d,dbl:0});}
+ if(t>T(7)+.2&&t<T(8)+.4)tf(880,280,1,.12,()=>itxt('ու՜ֆ',0,0,64,{prog:pen(t,T(7)+.2,.3),id:3770,col:RED}));});
+// S3 the competitor: price is written, buyer walks in
+scene(T(9)-.35,T(10)-.35,3900,-150,(t)=>{const lt=t-T(9)+.35;
+ const aw=[[328,282],[752,282],[778,382],[302,382]];wash([aw],BLUE,pen(lt,0,.4),0);
+ shop(540,520,1.25,{name:'',mood:'happy',awn:PAPER,prog:pen(lt,0,.6),id:3800});lifted(.5,()=>solid(330,160,420,64,14,PAPER));txt('Գինը գրված է',540,192,36,{w:900,col:BLUE});
+ tf(850,760,.9,.05,()=>{lifted(.6,()=>solid(-130,-110,260,220,18,PAPER));ink(Sh.rrect(-130,-110,260,220,18),{w:5,id:3870,prog:pen(lt,.2,.4)});txt('Տորթ',0,-50,32,{w:800});txt('12 000 ֏',0,10,46,{w:900,col:BLUE});txt('Պատվիրել ↗',0,64,26,{w:800,col:RED});ink(join(Sh.line(-80,110,-110,220),Sh.line(80,110,110,220)),{w:5,id:3871});});
+ const wk=P(t,T(9)+.2,T(9)+1.5);const wx=L(-80,500,E.io(wk)),ws=L(1,.55,P(t,T(9)+1.3,T(9)+1.7)),wa=1-P(t,T(9)+1.5,T(9)+1.8);if(wa>0){X.save();X.globalAlpha*=wa;walker(wx,L(1050,860,P(t,T(9)+1.2,T(9)+1.7)),70*ws,{id:3860,mood:'smile',t,look:1});X.restore();}
+ stamp(540,1180,.95,-.05,'Պատվերն ընդունված է ✓',P(t,T(9)+1.9,T(9)+2.2));
+ if(t>T(9)+2.2)[[260,1050],[820,1080],[540,1300]].forEach(([x,y],i)=>sparkle(x,y,22,pen(t,T(9)+2.2+i*.1,.3),RED,3880+i));});
+// S4 the owner who never knew (dark)
+scene(T(10)-.35,T(11)-.35,3500,2300,(t)=>{const lt=t-T(10)+.35,LN=PAPER;
+ ink(Sh.line(30,1360,1050,1372),{w:5,id:3900,col:LN});ink(join(Sh.line(60,1080,640,1080),Sh.line(60,1080,60,1360),Sh.line(640,1080,640,1360)),{w:5,id:3901,col:LN});
+ face(330,930,96,{id:3910,mood:'sad',look:1,blink:(t%2.7)<.12,col:LN});
+ tf(490,1040,.9,.3,()=>{X.save();X.shadowColor='rgba(120,180,255,.8)';X.shadowBlur=40;solid(-40,-70,80,140,14,'#9CC3F0');X.restore();txt('0',0,0,40,{w:900,col:DEEP});});
+ lifted(.9,()=>tilt(700,450,.92,.05,.07,()=>{solid(-300,-150,600,300,30,PAPER);ink(Sh.rrect(-300,-150,600,300,30),{w:5,id:3930});txt('Direct',-260,-100,36,{al:'left',f:'MO',w:800});
+  tf(-260,-38,1+.05*Math.max(0,Math.sin(t*4)),0,()=>txt('0 նոր հաղորդագրություն',0,0,34,{al:'left',w:900,col:RED,maxW:540}));ink(Sh.line(-270,4,270,4),{w:2.5,id:3931,col:GREY,dbl:0});
+  txt('Սպամ · «Դուք շահել եք iPhone»',-260,52,26,{al:'left',w:600,col:GREY,maxW:540});txt('Ուրիշ ոչինչ',-260,98,26,{al:'left',w:600,col:GREY});}));
+ tf(260,700,.92,-.04,()=>{lifted(.5,()=>solid(-170,-74,340,148,14,PAPER));txt2('Գինը՝ ըստ|տրամադրության',0,0,30,{w:900,col:RED,maxW:300});});
+ clock(560,760,56,t*2.2,1,3970,LN);
+ // footprints come to the door and leave
+ for(let i=0;i<10;i++){const u=i/9;const x=L(1080,700,u<.5?u*2:2-u*2),y=L(1260,1200,u<.5?u*2:2-u*2)+(i%2?16:-16)+(u>=.5?-70:0);const ap=P(t,T(10)+.2+i*.12,T(10)+.35+i*.12),fd=1-P(t,TE(10)-.6,TE(10)+.2);if(ap>0)ink(Sh.ellipse(x,y,16,9,0,7,12),{w:3,col:'#8FA3C0',id:3980+i,alpha:ap*fd,dbl:0});}
+ const ga=P(t,T(10)+1.0,T(10)+1.4)*(1-P(t,TE(10)-.6,TE(10)));if(ga>0){ink(Sh.circle(880,1030,52),{w:4,id:3945,col:'#8FA3C0',gaps:.55,dbl:0,alpha:ga});txt('ես',880,1030,30,{w:800,col:'#8FA3C0',a:ga});}});
+// S5 «Գրեք գինը»: the pen writes the price, blue bursts out of the tag
+scene(T(11)-.35,T(12)-.35,4800,2300,(t)=>{const sx=E.heavy(P(t,T(11)-.1,T(11)+.2));
+ tag(540,520,2.0,swing(t,T(11)+.6,.08,1.4,1),80,()=>{const q=1-P(t,T(11),T(11)+.2);if(q>0)itxt('?',0,185,140,{col:RED,id:3310,alpha:q});
+  itxt('12 000 ֏',0,160,46,{prog:pen(t,T(11)+.1,.45),id:3320,col:BLUE,maxW:150});itxt('-ից',0,232,44,{prog:pen(t,T(11)+.5,.2),id:3321,col:BLUE});},{str:PAPER});
+ if(t<T(11)+.8){const pp=P(t,T(11)+.1,T(11)+.7);tf(L(430,700,pp),L(820,1000,pp)-Math.sin(pp*30)*14,1,.6,()=>{lifted(.6,()=>{solid(-14,-190,28,200,8,RED);});ink(Sh.poly([[-14,10],[0,50],[14,10]],true),{w:4,col:PAPER,id:3990});});}});
+// S6 «Ամեն գրառման տակ»: a grid where every post gets its price
+const GRID=[['cake','12 000'],['cup','2 500'],['cookie','800'],['donut','1 200'],['slice','1 500'],['cake','4 000'],['cup','6 000'],['cookie','900'],['donut','3 000']];
+function mini(k,x,y,id){if(k=='cake')cake(x,y,.24,1,id);else if(k=='cup'){shape([[[x-30,y],[x+30,y],[x+20,y+40],[x-20,y+40]]],{fill:TBLUE,id,w:3.5});shape(Sh.ellipse(x,y-6,36,24,Math.PI,Math.PI*2,10).map(c=>[...c]),{fill:TRED,id:id+1,w:3.5});}
+ else if(k=='cookie'){shape(Sh.circle(x,y+10,36),{fill:'#F6DDB5',id,w:3.5});[[-12,0],[10,14],[4,-10]].forEach(([a,b],i)=>ink(Sh.circle(x+a,y+10+b,4),{w:3,id:id+2+i,dbl:0}));}
+ else if(k=='donut'){shape(Sh.circle(x,y+10,38),{fill:TRED,id,w:3.5});ink(Sh.circle(x,y+10,13),{w:3.5,id:id+1});}else{shape([[[x-40,y+40],[x+40,y+40],[x+40,y-10],[x-40,y+20]]],{fill:TRED,id,w:3.5});}}
+scene(T(12)-.35,T(13)-.35,6100,2300,(t)=>{
+ phone(540,880,.95,.03,1,(w,h)=>{ink(Sh.circle(60,60,40),{w:4,id:4000});txt('🎂',60,62,36,{w:800});txt('qo_tortery',120,46,28,{al:'left',f:'MO',w:800});txt('9 գրառում · 9 գին',120,82,22,{al:'left',w:800,col:BLUE});
+  const sz=148;GRID.forEach(([k,pr],i)=>{const gx=i%3,gy=Math.floor(i/3),x=6+gx*(sz+4)+sz/2,y=140+gy*(sz+4)+sz/2;solid(x-sz/2,y-sz/2,sz,sz,6,i%2?'#EEF3FA':'#FBF3F1');mini(k,x,y-14,4010+i*10);
+   const p=P(t,T(12)+.05+i*.11,T(12)+.3+i*.11);if(p>0)tf(x,y+48,spring(p,.5),0,()=>{X.font='900 22px SA';const ww=X.measureText(pr+' ֏').width+20;solid(-ww/2,-17,ww,34,17,RED);txt(pr+' ֏',0,1,22,{w:900,col:PAPER});});});
+  },{id:4090,body:DEEP});
+ itxt('Ամեն գրառման տակ',540,300,64,{id:4095,col:PAPER,prog:pen(t,T(12)-.2,.6),maxW:900});});
+// S7 Highlights + website
+scene(T(13)-.35,T(14)-.35,7400,2300,(t)=>{
+ tilt(340,520,1,.03,.06,()=>{lifted(.8,()=>solid(-290,-200,580,400,30,PAPER));ink(Sh.circle(-190,-90,60),{w:4,id:4110});txt('🎂',-190,-88,48,{w:800});txt('qo_tortery',-110,-120,30,{al:'left',f:'MO',w:800});txt('Տորթեր պատվերով',-110,-80,24,{al:'left',w:600,col:GREY});
+  const lk=P(t,T(13)+1.1,T(13)+1.3);txt('qo-tortery.am/գներ',-110,-40,26,{al:'left',w:900,col:BLUE});ink(Sh.line(-110,-20,140,-20),{w:3,col:BLUE,id:4111,prog:lk});
+  ['Գներ','Մենյու','Առաքում'].forEach((s,i)=>{const x=-180+i*170,y=90;const on=i==0;const tap=on?1+.15*Math.sin(Math.PI*P(t,T(13)+.2,T(13)+.5)):1;tf(x,y,tap,0,()=>{solid(-50,-50,100,100,50,on?TRED:'#EEF3FA');ink(Sh.circle(0,0,56),{w:on?7:4,col:on?RED:BLUE,id:4120+i});txt(['֏','🎂','🚚'][i],0,2,i?44:56,{w:900,col:on?RED:BLUE});});txt(s,x,y+82,24,{w:800,col:on?RED:K.ink});});});
+ const pl=E.land(P(t,T(13)+.45,T(13)+.85));if(pl>0)lifted(1,()=>tilt(L(200,330,pl),L(1100,960,pl),pl*.92,.04,-.08,()=>{solid(-280,-170,560,340,26,PAPER);ink(Sh.rrect(-280,-170,560,340,26),{w:5,id:4140,col:RED});txt('Գներ',0,-120,40,{w:900,col:RED});
+  [['Ծննդյան տորթ','12 000 ֏-ից'],['Մինի տորթ','6 000 ֏'],['Կապքեյք ×6','4 500 ֏']].forEach(([a,b],i)=>{const y=-40+i*70;txt(a,-250,y,28,{al:'left',w:700});txt(b,250,y,28,{al:'right',w:900,col:BLUE});});}));
+ const st=E.land(P(t,T(13)+1.3,T(13)+1.7));if(st>0)lifted(1.2,()=>tilt(L(1000,700,st),L(1300,1180,st),st*.86,.03,.09,()=>{solid(-260,-220,520,440,24,PAPER);solid(-260,-220,520,64,24,'#E3ECF8');[0,1,2].forEach(i=>ink(Sh.circle(-225+i*28,-188,8),{w:3,id:4150+i,col:[RED,'#F5B800',BLUE][i],dbl:0}));
+  txt('qo-tortery.am/գներ',-130,-188,22,{al:'left',w:800,col:BLUE});cake(-140,10,.4,1,4160);[0,1,2,3].forEach(i=>{txt(['Տորթ','Մինի','Կապքեյք','Թխվածք'][i],10,-110+i*58,24,{al:'left',w:800});txt(['12 000','6 000','4 500','900'][i],240,-110+i*58,24,{al:'right',w:900,col:BLUE});});
+  pill(0,170,'Պատվիրել',30,{bg:RED,id:4170});}));});
+// S8 order and pay without a word
+scene(T(14)-.35,T(15)-.35,8700,2300,(t)=>{
+ face(200,560,84,{id:4230,mood:t>T(14)+1.5?'happy':'flat',col:PAPER,prog:1});ink(Sh.line(160,600,240,600),{w:5,col:'#F5B800',id:4231,dbl:0});for(let i=0;i<5;i++)ink(Sh.line(168+i*16,592,168+i*16,608),{w:3,col:'#F5B800',id:4232+i,dbl:0});
+ pill(L(640,640,1),420,'Պատվիրել',44,{bg:RED,p:P(t,T(14)-.1,T(14)+.2),id:4240});
+ const cd=E.land(P(t,T(14)+.5,T(14)+1.0));if(cd>0)lifted(1,()=>tilt(L(1300,640,cd),780,1,.05,-.1+cd*.1,()=>{solid(-230,-140,460,280,28,'#123A73');ink(Sh.rrect(-230,-140,460,280,28),{w:4,col:PAPER,id:4250});solid(-180,-70,80,60,10,'#F5B800');txt('•••• 4242',-180,40,34,{al:'left',w:800,col:PAPER,f:'MO'});txt('VISA',170,90,30,{al:'right',w:900,col:PAPER,f:'MO'});}));
+ stamp(600,1120,1,-.05,'Վճարված ✓',P(t,T(14)+1.3,T(14)+1.6),{bg:PAPER,fg:BLUE});
+ if(t>T(14)+1.6)pill(600,1290,'ո՛չ զանգ, ո՛չ նամակ',28,{bg:'#123A73',p:P(t,T(14)+1.6,T(14)+1.9),id:4260});});
+// S9 custom orders in Direct, answered fast and with the price
+scene(T(15)-.35,T(17)-.35,10000,2300,(t)=>{const sec=cl((t-T(16))/.9)*40;
+ const ck=E.land(P(t,T(15)+.1,T(15)+.6));if(ck>0)tf(820,L(700,520,ck),ck,0,()=>{lifted(.8,()=>solid(-170,-200,340,400,30,PAPER));cake(0,10,.6,1,4300,{tiers:3});txt('եռահարկ',0,170,26,{w:800,col:GREY});});
+ phone(400,920,.82,-.03,1,(w,h)=>{ink(Sh.circle(40,42,24),{w:4,id:4310});txt('🎂',40,44,22,{w:800});txt('qo_tortery',76,42,28,{al:'left',f:'MO',w:800});ink(Sh.line(0,86,w,86),{w:3,id:4311,col:GREY,dbl:0});
+  const m1=E.land(P(t,T(15),T(15)+.3));if(m1>0){solid(16,140+(1-m1)*40,w-80,130,26,'#EEF2F8');txt2('Եռահարկ տորթ՝|շաբաթ օրվա համար',30,205+(1-m1)*40,24,{al:'left',w:700,maxW:w-110});}
+  const m2=E.land(P(t,T(16)+.9,T(16)+1.15));if(m2>0){solid(60,320+(1-m2)*40,w-76,150,26,BLUE);txt('Այո՛։ 45 000 ֏-ից։',84,365+(1-m2)*40,28,{al:'left',w:900,col:PAPER,maxW:w-120});txt('Պատվիրել՝ qo-tortery.am',84,415+(1-m2)*40,22,{al:'left',w:700,col:PAPER,maxW:w-120});}},{id:4320});
+ if(t>T(16)-.2)stopwatch(830,1070,1,sec,pen(t,T(16)-.2,.3),4330);});
+// S10 hide the price, lose the buyer
+scene(T(17)-.35,END-2.3,11300,2300,(t)=>{const fl=P(t,T(17)+.1,T(17)+.45);const flip=Math.cos(fl*Math.PI);
+ tag(380,330,1.7,swing(t,T(17)+.45,.1,1.4,.9),60,()=>{if(fl<.5){itxt('12 000 ֏',0,160,46,{id:3320,col:BLUE,maxW:150});}else itxt('?',0,185,140,{col:RED,id:3310});},{flip,str:PAPER});
+ const go=P(t,T(17)+.6,TE(17));const bx=L(800,1250,E.io(go));walker(bx,1050,80,{id:4400,mood:go>0?'flat':'smile',look:1,col:PAPER,t});
+ dash([[800,1180],[1000,1170],[1250,1180]],go,4410,'#8FC0FF');pill(780,760,'−1 գնորդ',44,{bg:RED,p:P(t,T(17)+1.0,T(17)+1.3),id:4420});});
+// S11 end
+scene(END-2.3,END,12600,2300,(t)=>{const lt=t-(END-2.3);
+ const lg=spring(P(lt,.0,.5),.65);if(lg>0&&LOGO.complete)tf(540,460,lg,0,()=>{const lw=320,lh=lw*LOGO.height/LOGO.width;X.save();X.globalCompositeOperation='multiply';X.drawImage(LOGO,-lw/2,-lh/2,lw,lh);X.restore();});
+ tag(540,580,.95,swing(t,END-2.0,.25,1.1,.4),50,()=>{itxt('12 000 ֏',0,160,46,{id:3320,col:BLUE,maxW:150});itxt('-ից',0,232,44,{id:3321,col:BLUE});});
+ const sp=P(lt,.4,.8);if(sp>0)lifted(.8,()=>tf(540,1160,spring(sp,.6),0,()=>{solid(-440,-115,880,230,40,BLUE);const A=[[-380,-34],[-312,-2],[-380,30],[-364,-2]];wash([A],PAPER,1,0);
+  txt('Ուղարկեք մի բիզնեսի,',-300,-32,40,{al:'left',w:900,col:PAPER,maxW:690});txt('որ դեռ գրում է «գինը՝ Direct-ով»',-300,28,34,{al:'left',w:800,col:'#FFE08A',maxW:690});}));
+ if(WIY.complete){const u=E.land(P(lt,.6,1.1));X.save();X.translate(L(1200,920,u),930);X.rotate(-.18);X.drawImage(WIY,-75,-75,150,150*WIY.height/WIY.width);X.restore();}
+ itxt('wiymood',540,1400,70,{fam:'S',prog:pen(lt,.9,.7),id:4520,col:BLUE,maxW:500});});
 // ---------- camera ----------
-const KEYS=[];const TR=.4;function key(t,x,y,z=1,r=0,dip=.1){KEYS.push([t,x,y,z,r,dip]);}
-SC.forEach((s,i)=>{if(i==4)return;key(s.t0+(i?.02:0),s.x,s.y,1,0,i==4?.3:.1);key(s.t1-TR,s.x+(i%2?-40:40),s.y+(i%2?30:-30),1.05,i%2?.012:-.012);});
-// the turn: slow pull back and down to the owner, then push in on the tag
-key(18.45,3900-40,-150+30,1.04,.012);key(19.4,3300,2500,.94,0,.32);key(22.7,3260,2470,1.0,-.01);key(23.35,4080-540,3532-960,1.5,0);key(24.5,4080-540,3532-960,1.58,.01);
+const KEYS=[];const TR=.38;function key(t,x,y,z=1,r=0,dip=.1){KEYS.push([t,x,y,z,r,dip]);}
+SC.forEach((s,i)=>{key(s.t0+(i?.02:0),s.x,s.y,1,0,i==4?.28:.1);key(s.t1-(i==3?.75:TR),s.x+(i%2?-40:40),s.y+(i%2?30:-30),1.05,i%2?.012:-.012);});
+// S5: push in on the tag, then pull out wide while blue floods
+KEYS.push([T(11)+.7,4800,2300,1.12,0,.1],[T(11)+1.35,4900,2300,.9,0,.1]);
 KEYS.sort((a,b)=>a[0]-b[0]);
 function cam(t){let i=KEYS.findIndex(k=>k[0]>t);if(i==-1)return KEYS[KEYS.length-1];if(i==0)return KEYS[0];const a=KEYS[i-1],b=KEYS[i];const travel=Math.hypot(b[1]-a[1],b[2]-a[2])>300;let u=(t-a[0])/(b[0]-a[0]);
  TRAVEL=travel&&u>0&&u<1;const e=travel?E.heavy(u):E.drift(u);return [0,L(a[1],b[1],e),L(a[2],b[2],e),L(a[3],b[3],e)*(travel?1-b[5]*Math.sin(Math.PI*u):1),L(a[4],b[4],e)+(travel?Math.sin(Math.PI*u)*.03*(b[1]>a[1]?1:-1):0)];}
-// ---------- depth: far doodles (blurred, slow) and near bokeh (blurred, fast) ----------
+// ---------- depth layers ----------
 const FC=document.createElement('canvas');FC.width=W;FC.height=H;const FX=FC.getContext('2d');
-const FAR2=[];{let s=23;const R=()=>{s=(s*16807)%2147483647;return s/2147483647;};for(let i=0;i<90;i++)FAR2.push([R()*12500-800,R()*5200-1000,R()*5|0,26+R()*46]);}
-const NEAR=[];{let s=5;const R=()=>{s=(s*16807)%2147483647;return s/2147483647;};for(let i=0;i<16;i++)NEAR.push([R()*12500,R()*5000-600,R()*3|0,70+R()*60,R()*6]);}
-function shapeAt(k,x,y,r,rot=0){const c=Math.cos(rot),s=Math.sin(rot);const T=p=>[x+p[0]*c-p[1]*s,y+p[0]*s+p[1]*c];
- if(k==0)return Sh.circle(0,0,r*.6).map(q=>q.map(T));if(k==1)return [[...TAGB,TAGB[0]].map(p=>T([p[0]*r/180,p[1]*r/180]))];if(k==2)return Sh.cat([[-r,0],[-r*.3,-r*.5],[r*.3,r*.4],[r,0]]).map(q=>q.map(T));
- if(k==3){const pts=[];for(let j=0;j<=10;j++){const a=-Math.PI/2+j*Math.PI/5,rr=j%2?r*.25:r*.6;pts.push([Math.cos(a)*rr,Math.sin(a)*rr]);}return [pts.map(T)];}return Sh.rrect(-r*.5,-r*.35,r,r*.7,8).map(q=>q.map(T));}
-function depthLayer(arr,k,par,blur,alpha,w,col){const cx=k[1],cy=k[2],z=k[3];FX.setTransform(1,0,0,1,0,0);FX.clearRect(0,0,W,H);Ink.init(FX);
- FX.setTransform(z,0,0,z,W/2*(1-z),H/2*(1-z));arr.forEach((d,i)=>{let x=d[0]-cx*par,y=d[1]-cy*par;if(par>1){x=((x%1600)+1600)%1600-260;y=((y%2400)+2400)%2400-240;}if(x<-200||x>W+200||y<-200||y>H+200)return;ink(shapeAt(d[2],x,y,d[3],d[4]||0),{w,col,alpha,id:5000+i,dbl:0,amp:1.4});});
+const FAR2=[];{let s=23;const R=()=>{s=(s*16807)%2147483647;return s/2147483647;};for(let i=0;i<110;i++)FAR2.push([R()*14500-800,R()*5400-1000,R()*5|0,24+R()*40,R()*6]);}
+const NEAR=[];{let s=5;const R=()=>{s=(s*16807)%2147483647;return s/2147483647;};for(let i=0;i<14;i++)NEAR.push([R()*12500,R()*5000-600,R()*4|0,60+R()*60,R()*6]);}
+function shapeAt(k,x,y,r,rot=0){const c=Math.cos(rot),s=Math.sin(rot);const Tt=p=>[x+p[0]*c-p[1]*s,y+p[0]*s+p[1]*c];
+ if(k==0)return Sh.circle(0,0,r*.6).map(q=>q.map(Tt));if(k==1)return [[[-50,30],[-22,0],[22,0],[50,30],[50,150],[-50,150],[-50,30]].map(p=>Tt([p[0]*r/110,p[1]*r/110-r*.6]))];if(k==2)return Sh.cat([[-r,0],[-r*.3,-r*.5],[r*.3,r*.4],[r,0]]).map(q=>q.map(Tt));
+ if(k==3){const pts=[];for(let j=0;j<=10;j++){const a=-Math.PI/2+j*Math.PI/5,rr=j%2?r*.25:r*.6;pts.push([Math.cos(a)*rr,Math.sin(a)*rr]);}return [pts.map(Tt)];}return Sh.rrect(-r*.5,-r*.35,r,r*.7,8).map(q=>q.map(Tt));}
+function depthLayer(arr,k,par,blur,alpha,w,colFn){const cx=k[1],cy=k[2],z=k[3];FX.setTransform(1,0,0,1,0,0);FX.clearRect(0,0,W,H);Ink.init(FX);
+ FX.setTransform(z,0,0,z,W/2*(1-z),H/2*(1-z));arr.forEach((d,i)=>{let x=d[0]-cx*par,y=d[1]-cy*par;if(par>1){x=((x%1600)+1600)%1600-260;y=((y%2400)+2400)%2400-240;}if(x<-200||x>W+200||y<-200||y>H+200)return;ink(shapeAt(d[2],x,y,d[3],d[4]||0),{w,col:colFn(i),alpha,id:5000+i,dbl:0,amp:1.4});});
  Ink.init(X);X.save();X.setTransform(1,0,0,1,0,0);X.filter=`blur(${blur}px)`;X.drawImage(FC,0,0);X.filter='none';X.restore();}
-// ---------- captions (burned in, word by word) ----------
-const CAP_SIZE=48,CAP_MAXW=840,CAP_Y=1540;
+// ---------- captions ----------
+const CAP_SIZE=48,CAP_MAXW=840,CAP_Y=1560;
 function wrapWords(words){const lines=[[]];X.font=`700 ${CAP_SIZE}px SA`;for(const w of words){const cur=lines[lines.length-1];if(X.measureText([...cur,w].join(' ')).width>CAP_MAXW&&cur.length)lines.push([w]);else cur.push(w);}return lines;}
-function captions(t){const ln=LINES.find(l=>t>=l[0]-.05&&t<=l[1]+.25);if(!ln||window.NOCAP)return;if(t<.05&&ln===LINES[0])return; // frame 1 carries the hook already
+function captions(t){const ln=LINES.find(l=>t>=l[0]-.05&&t<=l[1]+.25);if(!ln||window.NOCAP)return;if(t<.05)return;
  const words=ln[2].split(' ');const lines=wrapWords(words);const lens=words.map(w=>w.length+2),tot=lens.reduce((x,y)=>x+y,0);const starts=[];{let acc=0;lens.forEach(l=>{starts.push(ln[0]+(ln[1]-ln[0])*acc/tot);acc+=l;});}let idx=0;const good=t>=TURN;
  const y0=CAP_Y-(lines.length-1)*32;lines.forEach((lw,li)=>{X.font=`700 ${CAP_SIZE}px SA`;const full=lw.join(' ');const fw=X.measureText(full).width;let x=W/2-fw/2;const yy=y0+li*64;
-  X.save();X.globalAlpha=.82;X.fillStyle=K.paper;X.beginPath();X.roundRect(W/2-fw/2-26,yy-40,fw+52,80,22);X.fill();X.restore();
-  lw.forEach(w=>{const st=starts[idx];const on=t>=st;const fresh=P(t,st,st+.2);const ww=X.measureText(w+' ').width;const keyw=/Direct|թանկ|մրցակցի|իմանում|Գրեք|առանց|արագ|գուշակում|Գուշակում|12 000/.test(w);
-   X.save();X.font=`700 ${CAP_SIZE}px SA`;X.textBaseline='middle';X.globalAlpha=on?1:.22;X.fillStyle=keyw&&on?(good?K.blue:K.red):K.ink;const wob=Ink.sn(Ink.BF*.8+idx*3.1)*.8;X.fillText(w,x+wob,yy-(on?(1-E.outExpo(fresh))*10:0));X.restore();
-   reg(x,yy-30,x+X.measureText(w).width,yy+30,'cap:'+w);x+=ww;idx++;});
-  const prog=cl((t-ln[0])/(ln[1]-ln[0]));const lp=cl(prog*lines.length-li);if(lp>0)ink(Sh.cat([[W/2-fw/2,yy+36],[W/2,yy+40],[W/2+fw/2,yy+34]]),{w:3.5,col:good?K.blue:K.red,prog:lp,id:1700+li,dbl:.2,alpha:.7});});}
+  X.save();X.globalAlpha=.92;X.fillStyle=PAPER;X.shadowColor='rgba(11,27,51,.18)';X.shadowBlur=14;X.shadowOffsetY=6;X.beginPath();X.roundRect(W/2-fw/2-26,yy-40,fw+52,80,22);X.fill();X.restore();
+  lw.forEach(w=>{const st=starts[idx];const on=t>=st;const fresh=P(t,st,st+.2);const ww=X.measureText(w+' ').width;const keyw=/Direct|թանկ|մրցակցի|իմանում|Գրեք|առանց|արագ|գուշակում|Թաքցնում|կորցնում|Ջնջում|գրառման|Highlights|մերժեմ|որոշեցի/.test(w);
+   X.save();X.font=`700 ${CAP_SIZE}px SA`;X.textBaseline='middle';X.globalAlpha=on?1:.22;X.fillStyle=keyw&&on?(good?BLUE:RED):K.ink;const wob=Ink.sn(Ink.BF*.8+idx*3.1)*.8;X.fillText(w,x+wob,yy-(on?(1-E.outExpo(fresh))*10:0));X.restore();
+   reg(x,yy-30,x+X.measureText(w).width,yy+30,'cap:'+w);x+=ww;idx++;});});}
 // ---------- frame ----------
 function drawWorld(wt){const k=cam(wt);const cx=k[1],cy=k[2],z=k[3],r=k[4];
  X.setTransform(1,0,0,1,0,0);X.fillStyle=PAT;X.fillRect(0,0,W,H);
- if(!window.NOFAR)depthLayer(FAR2,k,.45,2.4,.13,2.5,'#5B6B82');
+ X.save();X.translate(W/2,H/2);X.scale(z,z);X.rotate(r);X.translate(-(cx+W/2),-(cy+H/2));regions(wt);X.restore();
+ const vx=cx+W/2,vy=cy+H/2;const inDark=vx>3150&&vx<5650&&vy>2080,inBlue=vx>=5650&&vx<12460&&vy>2080;
+ if(!window.NOFAR)depthLayer(FAR2,k,.45,2.4,inDark||inBlue?.22:.13,2.5,()=>inDark?'#8FA3C0':inBlue?'#8FC0FF':'#5B6B82');
  X.save();X.translate(W/2,H/2);X.scale(z,z);X.rotate(r);X.translate(-(cx+W/2),-(cy+H/2));
- SC.forEach((s,i)=>{const st=i?s.t0-.3:s.t0;if(wt<st)return;if(Math.abs(s.x-cx)>1600||Math.abs(s.y-cy)>2400)return;X.save();X.translate(s.x,s.y);s.fn(wt-st);X.restore();});
- lifted(1.2,()=>drawTag(wt));
- X.restore();return k;}
-function frame(t){X.setTransform(1,0,0,1,0,0);X.globalAlpha=1;Ink.frame(t);const k=drawWorld(t);
+ SC.forEach((s,i)=>{const st=i?s.t0-.3:s.t0;if(wt<st)return;if(Math.abs(s.x-cx)>1600||Math.abs(s.y-cy)>2400)return;X.save();X.translate(s.x,s.y);s.fn(wt);X.restore();});
+ X.restore();return [k,inDark||inBlue];}
+function frame(t){X.setTransform(1,0,0,1,0,0);X.globalAlpha=1;Ink.frame(t);const [k,dark]=drawWorld(t);
  X.drawImage(vig,0,0);
- if(!window.NONEAR)depthLayer(NEAR,k,1.6,7,.28,7,'#0B1B33');
+ if(!window.NONEAR)depthLayer(NEAR,k,1.6,7,dark?.22:.26,7,i=>dark?(i%3?PAPER:RED):(i%3?'#0B1B33':RED));
  captions(t);}
 const acc=document.createElement('canvas');acc.width=W;acc.height=H;const A=acc.getContext('2d');
 window.renderFrame=(t,fps=30)=>{cam(t);if(!TRAVEL){frame(t);return;}A.clearRect(0,0,W,H);for(let i=0;i<3;i++){frame(t+(i/3-.33)*.6/fps);A.globalAlpha=1/(i+1);A.drawImage(c,0,0);}X.setTransform(1,0,0,1,0,0);X.globalAlpha=1;X.drawImage(acc,0,0);};
