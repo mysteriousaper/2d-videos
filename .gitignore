@@ -1,0 +1,11 @@
+node_modules/
+fr/
+frs2/
+prev/
+*.raw
+*.wav
+*.mp3
+*.m4a
+*.mp4
+z_*.jpg
+__pycache__/
