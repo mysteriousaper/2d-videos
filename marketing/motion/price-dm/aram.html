@@ -9,8 +9,9 @@ body{margin:0;background:#000}canvas{display:block}</style></head><body>
 <script>
 // WiyMood · «Գինը՝ Direct-ով» v2 · ink + riso colour washes, 2.5D. Every spoken line has its own picture.
 // LINES is a placeholder until the voice is recorded; every scene and beat is keyed to LINES, so re-timing = editing LINES.
-const LINES=[[0.1, 2.42, "Ծանոթացեք՝ Արամն է։ Նա համեղ տորթեր է թխում։"], [2.6, 6.95, "Արամը կարծում է, որ արել է ամեն ինչ, որ հաճախորդներն իրեն նկատեն։ Նույնիսկ կայք ունի։"], [7.35, 9.83, "Դե, կայք ասելը մի փոքր չափազանցություն է…"], [10.01, 12.33, "Բացվում է այնքան դանդաղ, որ տորթը կհասցնի հնանալ։"], [12.51, 15.12, "Հսկա լոգո ու «Բարի գալուստ»։ Ի՞նչ է վաճառում՝ գուշակեք։"], [15.3, 17.33, "Մենյուն՝ PDF, կարդալու համար մանրադիտակ է պետք։"], [17.51, 19.25, "Գին չկա, կոճակ չկա, միայն «զանգահարեք»։"], [19.43, 21.46, "Գնորդները մտնում են ու գնում մրցակցի մոտ։"], [21.64, 23.09, "Իսկ Արամը մեղադրում է Instagram-ին։"], [23.49, 26.68, "Եթե Արամը գար WiyMood, կունենար կայք, որը բացվում է մի ակնթարթում,"], [26.86, 29.47, "ու այնքան գեղեցիկ է, որ մարդիկ տորթի նկարն ընկերներին են ուղարկում,"], [29.65, 31.97, "գինը երևում է, պատվերը՝ երեք քայլ, վճարումը՝ առցանց։"], [32.15, 34.76, "Ու Արամը կբողոքեր միայն մի բանից՝ չի հասցնում թխել։"], [35.16, 38.64, "Եթե Ձեր կյանքն էլ Արամի կյանքի նման է, գրեք «ԲՐԵՆԴ»՝ անվճար կնայենք։"]];
-const T=i=>LINES[i][0],TE=i=>LINES[i][1],END=LINES[13][1]+2.6,TURN=T(9);
+const LINES=[[0.2, 3.42, "Ծանոթացեք՝ Արամն է։ Նա համեղ տորթեր է թխում։"], [3.5, 8.2, "Արամը կարծում է, որ արել է ամեն ինչ, որ հաճախորդներն իրեն նկատեն։ Եվ նույնիսկ կայք ունի։"], [8.5, 10.85, "Դե, կայք ասելը մի փոքր չափազանցություն է…"], [10.8, 13.52, "Բացվում է այնքան դանդաղ, որ տորթը կհասցնի հնանալ։"], [13.75, 15.75, "Իսկ Արամը մեղադրում է Instagram-ին։"], [16.0, 19.15, "Եթե Արամը գար WiyMood, կունենար կայք, որը բացվում է մի ակնթարթում,"], [19.78, 23.2, "և այնքան գեղեցիկ է, որ մարդիկ տորթի նկարն իրենց ընկերներին են ուղարկում,"], [23.85, 26.8, "և Արամը կբողոքեր միայն մի բանից, որ չի հասցնում թխել։"], [27.6, 31.0, "Եթե Ձեր կյանքն էլ է Արամի կյանքի նման, գրեք «ԲՐԵՆԴ» բառը՝ անվճար կնայենք։"]];
+const CAPS=[[0.5, 1.96, "Ծանոթացեք՝ Արամն է։", [0.5, 1.08, 1.56]], [1.98, 3.4, "Նա համեղ տորթեր է թխում։", [1.98, 2.46, 2.7, 2.94, 2.96]], [3.5, 4.52, "Արամը կարծում է,", [3.5, 3.98, 4.36]], [4.54, 5.5, "որ արել է ամեն ինչ,", [4.54, 4.56, 4.82, 4.9, 5.4]], [5.52, 7.34, "որ հաճախորդներն իրեն նկատեն։", [5.52, 6.2, 6.44, 6.74]], [7.36, 8.18, "Եվ նույնիսկ կայք ունի։", [7.36, 7.5, 7.8, 8.02]], [8.56, 10.83, "Դե, կայք ասելը մի փոքր չափազանցություն է…", [8.56, 9.0, 9.46, 9.7, 9.8, 9.96, 10.1]], [10.8, 12.26, "Բացվում է այնքան դանդաղ,", [10.8, 11.42, 11.56, 11.88]], [12.28, 13.5, "որ տորթը կհասցնի հնանալ։", [12.28, 12.38, 12.7, 13.2]], [13.78, 15.73, "Իսկ Արամը մեղադրում է Instagram-ին։", [13.78, 14.5, 14.8, 15.2, 15.26]], [16.1, 17.24, "Եթե Արամը գար WiyMood,", [16.1, 16.34, 16.64, 16.88]], [17.26, 19.13, "կունենար կայք, որը բացվում է մի ակնթարթում,", [17.26, 17.26, 17.68, 18.08, 18.26, 18.6, 18.68]], [19.82, 21.02, "և այնքան գեղեցիկ է,", [19.82, 20.16, 20.54, 20.98]], [21.04, 23.18, "որ մարդիկ տորթի նկարն իրենց ընկերներին են ուղարկում,", [21.04, 21.14, 21.84, 22.22, 22.46, 22.84, 22.84, 23.12]], [23.88, 25.48, "և Արամը կբողոքեր միայն մի բանից,", [23.88, 24.06, 24.36, 24.94, 25.1, 25.3]], [25.5, 26.78, "որ չի հասցնում թխել։", [25.5, 25.98, 26.14, 26.36]], [27.66, 28.92, "Եթե Ձեր կյանքն էլ է Արամի", [27.66, 27.9, 28.14, 28.44, 28.54, 28.64]], [28.94, 30.98, "կյանքի նման, գրեք «ԲՐԵՆԴ» բառը՝ անվճար կնայենք։", [28.94, 28.94, 29.26, 29.84, 30.08, 30.46, 30.74]]];
+const T=i=>LINES[i][0],TE=i=>LINES[i][1],END=LINES[8][1]+2.6,TURN=T(5);
 const PAPER=K.paper,DEEP='#0B1B33',BLUE=K.blue,RED=K.red,GREY=K.grey,TBLUE='#CFE0F5',TRED='#FCD6D1';
 // ---------- colour + depth helpers ----------
 function path(cs,ox=0,oy=0){X.beginPath();cs.forEach(c=>{c.forEach((p,i)=>i?X.lineTo(p[0]+ox,p[1]+oy):X.moveTo(p[0]+ox,p[1]+oy));X.closePath();});}
@@ -107,11 +108,11 @@ function coin(x,y,s,id){tf(x,y,s,0,()=>{shape(Sh.circle(0,0,22),{fill:YEL,line:K
 function magnifier(x,y,s,id){tf(x,y,s,-.5,()=>{X.save();X.globalAlpha=.25;X.fillStyle='#DDEBFA';X.beginPath();X.arc(0,0,90,0,7);X.fill();X.restore();ink(Sh.circle(0,0,90),{w:10,col:K.ink,id});ink(Sh.line(0,92,0,250),{w:22,col:'#7A4B2A',id:id+1,dbl:0});});}
 function bigPen(x,y,s,r,id){tf(x,y,s,r,()=>{lifted(.6,()=>{solid(-18,-260,36,240,12,BLUE);solid(-18,-260,36,40,12,RED);});shape([[[-18,-20],[18,-20],[0,40]]],{fill:PAPER,id,w:4,off:0});});}
 // ---------- regions ----------
-const DX0=7150,DX1=8800,BX1=14230;
+const DX0=3300,DX1=4950,BX1=8900;
 const DARK=rough(DX0,2080,DX1+60,4600,3),BLUEZ=rough(DX1-60,2080,BX1,4600,9);
-let BURST={x:9330,y:2900};
+let BURST={x:5460,y:2940};
 function regions(t){X.save();X.fillStyle=DEEP;path(DARK);X.fill();
- const r=E.heavy(P(t,T(9)+.15,T(9)+.85))*3000;X.fillStyle=BLUE;if(r>0){X.save();path(DARK);X.clip();X.beginPath();X.arc(BURST.x,BURST.y,r,0,7);X.fill();X.restore();}
+ const r=E.heavy(P(t,T(5)+.15,T(5)+.85))*3000;X.fillStyle=BLUE;if(r>0){X.save();path(DARK);X.clip();X.beginPath();X.arc(BURST.x,BURST.y,r,0,7);X.fill();X.restore();}
  path(BLUEZ);X.fill();X.restore();}
 // ---------- scenes ----------
 const SC=[];function scene(t0,t1,x,y,fn){SC.push({t0,t1,x,y,fn});}
@@ -145,7 +146,7 @@ scene(T(2)-.35,T(3)-.35,1300,-80,(t)=>{phone(560,880,.95,.04,1,(w,h)=>awful(t,w,
  if(fr>0)itxt('…',200,640,120,{id:9350,col:RED,prog:fr});
  if(t>T(2)+.9)tf(880,330,1,.15,()=>itxt('հըմ',0,0,60,{id:9351,col:GREY,prog:pen(t,T(2)+.9,.3)}));});
 // S3 slow loading, the cake goes stale
-scene(T(3)-.35,T(4)-.35,2600,-160,(t)=>{const lt=P(t,T(3),TE(3)+.3);
+scene(T(3)-.35,T(4)-.12,2600,-160,(t)=>{const lt=P(t,T(3),TE(3)+.3);
  phone(380,880,.85,-.03,1,(w,h)=>{solid(0,0,w,h,0,'#F4F4F4');tf(w/2,h/2-80,1,t*4,()=>{for(let i=0;i<10;i++){const a=i/10*Math.PI*2;ink(Sh.line(Math.cos(a)*40,Math.sin(a)*40,Math.cos(a)*70,Math.sin(a)*70),{w:8,col:K.ink,id:9400+i,dbl:0,alpha:.15+.85*((i/10+t*1.5)%1)});}});
   solid(60,h/2+60,w-120,26,13,'#E2E6EE');solid(60,h/2+60,(w-120)*(.01+lt*.04),26,13,RED);txt(Math.round(1+lt*4)+'%',w/2,h/2+130,40,{w:900,col:RED});txt('Բեռնվում է…',w/2,h/2+190,26,{w:700,col:GREY});},{id:9410});
  // the cake wilts
@@ -153,39 +154,14 @@ scene(T(3)-.35,T(4)-.35,2600,-160,(t)=>{const lt=P(t,T(3),TE(3)+.3);
   if(sag>.3){const wp=P(t,T(3)+.6,TE(3));for(let i=0;i<6;i++){const a=-Math.PI*.9+i*.16;ink(Sh.line(-130,-120,-130+Math.cos(a)*120*wp,-120+Math.sin(a)*120*wp),{w:2,col:GREY,id:9440+i,dbl:0});}for(let k=1;k<4;k++)ink(Sh.ellipse(-130,-120,30*k*wp,30*k*wp,-Math.PI*.9,-Math.PI*.1,8),{w:2,col:GREY,id:9450+k,dbl:0});}
   moth(Math.sin(t*3)*120,-200+Math.cos(t*4)*40,.9,t,9460);});
  tf(830,450,1,.05,()=>{const days=['Երկ','Երք','Չրք','Հնգ'];const d=Math.min(3,Math.floor(lt*4));lifted(.5,()=>solid(-80,-80,160,160,14,PAPER));solid(-80,-80,160,44,14,RED);txt(days[d],0,20,52,{w:900});});});
-// S4 giant logo, guess what he sells
-scene(T(4)-.35,T(5)-.35,3900,-40,(t)=>{
- phone(540,700,.7,.03,1,(w,h)=>{solid(0,0,w,h,0,'#FFFDF5');const gl=1+.03*Math.sin(t*3);tf(w/2,330,gl,0,()=>{itxt('ԱՐԱՄ',0,0,170,{id:9500,col:RED,maxW:430});for(let i=0;i<5;i++){const a=t*2+i*1.3;sparkle(Math.cos(a)*200,Math.sin(a)*120,18,1,YEL,9510+i);}});txt('Բարի գալուստ',w/2,560,40,{w:400,col:GREY,f:'serif'});},{id:9520});
- const qs=['Կոշի՞կ','Բա՞նկ','Ատամնաբույժ՞'];[[190,1420,B[3]],[540,1440,B[1]],[890,1420,B[0]]].forEach(([x,y,o],i)=>{person(x,y,.72,{...o,id:9530+i*60,mood:'wow',look:i==0?1:i==2?-1:0});const p=P(t,T(4)+.9+i*.25,T(4)+1.2+i*.25);if(p>0){const by=i==1?1180:1050;bubble(x+(i==0?40:i==2?-40:0),by-(i==1?0:0),330,140,p,9600+i*3,[0,1]);txt(qs[i],x+(i==0?40:i==2?-40:0),by,38,{w:900,maxW:290,a:p});}});});
-// S5 PDF menu, you need a microscope
-scene(T(5)-.35,T(6)-.35,5200,-160,(t)=>{
- phone(560,840,.9,-.02,1,(w,h)=>{solid(0,0,w,h,0,'#5B6B82');solid(0,0,w,60,0,'#2B3A55');txt('menu_final_v3_NEW.pdf',w/2,30,20,{w:700,col:PAPER,f:'MO'});solid(40,90,w-80,h-130,4,PAPER);
-  for(let i=0;i<34;i++)solid(70,120+i*20,(w-140)*(.4+.6*((i*37)%10)/10),6,3,'#9AA5B6');txt('ՄԵՆՅՈՒ',w/2,105,12,{w:900});},{id:9700});
- const mx=L(300,760,(Math.sin(t*1.4)+1)/2);magnifier(mx,780,1,9720);
- person(190,1390,.7,{...B[3],id:9740,mood:'flat',look:1,arms:[[.3,.2],[2.2,.8]]});
-});
-// S6 no price, no button, only «call us»
-scene(T(6)-.35,T(7)-.35,6500,-40,(t)=>{
- phone(420,840,.85,.03,1,(w,h)=>{solid(0,0,w,h,0,'#FFFDF5');[0,1].forEach(i=>{const y=110+i*260;cake(110,y+80,.3,1,9800+i*30);txt(['Ծննդյան տորթ','Միրգ ու կրեմ'][i],210,y+40,24,{al:'left',w:800});tag(330,y+70,.42,Math.sin(t*3+i)*.1,20,()=>itxt('?',0,185,140,{col:RED,id:9860+i}));});
-  ink(Sh.rrect(60,650,w-120,80,40),{w:4,col:GREY,id:9870,gaps:.6,dbl:0});txt('Պատվիրել',w/2,690,30,{w:800,col:'#C0C6D0'});cross(w/2,690,1.6,P(t,T(6)+.6,T(6)+.9),RED,9871);
-  solid(0,h-90,w,90,0,RED);txt('ԶԱՆԳԱՀԱՐԵՔ',w/2,h-45,40,{w:900,col:PAPER});},{id:9880});
- rotary(850,900,1,t,9900);if(t>T(6)+1.0)tf(850,700,1,.1,()=>itxt('դզզզ…',0,0,52,{id:9930,col:RED,prog:pen(t,T(6)+1.0,.3)}));
- if(t>T(6)+1.2)tf(850,1180,1,0,()=>txt('պատասխան չկա',0,0,30,{w:800,col:GREY}));});
-// S7 buyers come in and go to the competitor
-scene(T(7)-.35,T(8)-.35,7800,-150,(t)=>{
- tf(250,760,1,0,()=>{shape(Sh.rrect(-200,-300,400,560,24),{fill:'#E6E9EF',id:10000});solid(-140,-60,280,320,12,DEEP);txt('Արամի կայքը',0,-220,34,{w:900,col:GREY});});
- shop(820,700,1.1,{name:'',mood:'happy',awn:PAPER,prog:1,id:10020});wash([[[633,491],[1007,491],[1029,579],[611,579]]],BLUE,1,0);lifted(.5,()=>solid(640,420,360,60,14,PAPER));txt('Կողքի տորթեր',820,450,32,{w:900,col:BLUE});
- tf(820,1010,.8,0,()=>{lifted(.5,()=>solid(-140,-50,280,100,16,PAPER));txt('Տորթ՝ 12 000 ֏',0,0,34,{w:900,col:BLUE});});
- B.forEach((o,i)=>{const s0=T(7)-.1+i*.3;const u=P(t,s0,s0+2.2);if(u<=0)return;let x,y=1360,sc=.68;if(u<.35){x=L(-80,230,u/.35);}else if(u<.5){x=230;sc=L(.68,.45,(u-.35)/.15);y=1300;}else{x=L(230,800,(u-.5)/.5);}const vis=!(u>.38&&u<.47);
-  if(vis)person(x,y,sc,{...o,id:10100+i*60,walk:t*9+i,mood:u>.5?'smile':'flat',look:1});if(u>.5&&u<1){coin(x-60,1150-((t*3+i)%1)*60,1,10350+i);}});});
 // S8 dark: Aram blames Instagram
-scene(T(8)-.35,T(9)-.35,7800,2300,(t)=>{const LN=PAPER;
+scene(T(4)-.12,T(5)-.35,3900,2300,(t)=>{const LN=PAPER;
  tf(820,520,1,0,()=>{ink(Sh.rrect(-150,-150,300,300,20),{w:5,col:LN,id:10400});ink(join(Sh.ellipse(-30,-20,50,50,Math.PI*.3,Math.PI*1.7,24),Sh.ellipse(-10,-20,40,40,Math.PI*1.65,Math.PI*.35,24)),{w:5,col:YEL,id:10401});});
- igLogo(300,560,1.1,10410,PAPER);if(t>T(8)+.3)tf(420,440,1,.2,()=>itxt('!',0,0,90,{id:10415,col:RED}));
+ igLogo(300,560,1.1,10410,PAPER);if(t>T(4)+.3)tf(420,440,1,.2,()=>itxt('!',0,0,90,{id:10415,col:RED}));
  ink(Sh.line(40,1300,1040,1310),{w:5,col:LN,id:10420});
- const shake=Math.sin(t*40)*8*(t>T(8)+.2?1:0);person(540,1300,1.2,{...ARAM,line:LN,id:10430,mood:'angry',look:-1,arms:[[2.0,.9],[2.6,.4]],hold:(h)=>{tf(h[1][0]+shake,h[1][1]-40,1,.2,()=>{solid(-40,-75,80,150,14,'#9CC3F0');ink(Sh.rrect(-40,-75,80,150,14),{w:4,col:LN,id:10480});txt('0',0,0,40,{w:900,col:DEEP});});}});
+ const shake=Math.sin(t*40)*8*(t>T(4)+.2?1:0);person(540,1300,1.2,{...ARAM,line:LN,id:10430,mood:'angry',look:-1,arms:[[2.0,.9],[2.6,.4]],hold:(h)=>{tf(h[1][0]+shake,h[1][1]-40,1,.2,()=>{solid(-40,-75,80,150,14,'#9CC3F0');ink(Sh.rrect(-40,-75,80,150,14),{w:4,col:LN,id:10480});txt('0',0,0,40,{w:900,col:DEEP});});}});
  for(let i=0;i<2;i++){const u=(t*1.2+i*.5)%1;const sd=i?1:-1;ink(Sh.bez([540+sd*95,620-u*80],[540+sd*125,590-u*80],[540+sd*95,560-u*80],[540+sd*125,530-u*80]),{w:5,col:'#8FA3C0',id:10490+i,dbl:0,alpha:1-u});}
- if(t>T(8)+.5)bubble(820,820,300,140,P(t,T(8)+.5,T(8)+.8),10495,[-.6,1],PAPER);if(t>T(8)+.7)txt('#@!',820,820,56,{w:900,col:RED});});
+ if(t>T(4)+.5)bubble(820,820,300,140,P(t,T(4)+.5,T(4)+.8),10495,[-.6,1],PAPER);if(t>T(4)+.7)txt('#@!',820,820,56,{w:900,col:RED});});
 // S9 «Եթե Արամը գար WiyMood…» instant site
 function goodSite(t,w,h,{prices=0,steps=0,paid=0}={}){solid(0,0,w,h,0,PAPER);txt('Արամի տորթերը',24,40,30,{al:'left',w:900,col:RED});txt('☰',w-36,40,30,{w:900});
  solid(16,80,w-32,330,24,'#FBE7E3');cake(w/2,250,.7,1,10600);txt('Ձեռքի աշխատանք՝ ամեն օր թարմ',w/2,450,24,{w:800});
@@ -193,49 +169,42 @@ function goodSite(t,w,h,{prices=0,steps=0,paid=0}={}){solid(0,0,w,h,0,PAPER);txt
  pill(w/2,620,'Պատվիրել',36,{bg:RED,id:10630});
  if(steps>0){[1,2,3].forEach((n,i)=>{const on=steps>i;tf(w/2-120+i*120,730,1,0,()=>{solid(-32,-32,64,64,32,on?BLUE:'#E2E6EE');txt(String(n),0,2,30,{w:900,col:on?PAPER:GREY});});});}
  if(paid>0)stamp(w/2,800,.7,-.05,'Վճարված ✓',paid,{bg:BLUE,id:10640});}
-scene(T(9)-.35,T(10)-.35,9100,2300,(t)=>{const ap=E.land(P(t,T(9)-.2,T(9)+.3));
+scene(T(5)-.35,T(6)-.35,5200,2300,(t)=>{const ap=E.land(P(t,T(5)-.5,T(5)+.1));
  if(WIY.complete){X.save();X.translate(L(-200,190,ap),760);X.rotate(-.12);X.drawImage(WIY,-150,-150,300,300*WIY.height/WIY.width);X.restore();}bigPen(L(-80,260,ap),640,1,.7,10700);
- const st=P(t,T(9)+.1,T(9)+.45);if(st>0)phone(650,950,.85*E.heavy(st),.04,1,(w,h)=>goodSite(t,w,h),{id:10710});
- if(t>T(9)+.45){stopwatch(870,420,.9,0,1,10720,PAPER);tf(870,560,1,0,()=>pill(0,0,'0.8 վ',40,{bg:YEL,fg:K.ink,p:P(t,T(9)+.9,T(9)+1.1),id:10730}));}
- if(t>T(9)+.7)for(let i=0;i<3;i++)ink([[[960-i*30,700+i*20],[920-i*30,780+i*20],[960-i*30,780+i*20],[920-i*30,860+i*20]]],{w:6,col:YEL,id:10740+i,dbl:0,prog:pen(t,T(9)+.7+i*.1,.2)});});
+ const st=P(t,T(5)+.1,T(5)+.45);if(st>0)phone(650,950,.85*E.heavy(st),.04,1,(w,h)=>goodSite(t,w,h),{id:10710});
+ if(t>T(5)+.45){stopwatch(870,420,.9,0,1,10720,PAPER);tf(870,560,1,0,()=>pill(0,0,'0.8 վ',40,{bg:YEL,fg:K.ink,p:P(t,T(5)+.9,T(5)+1.1),id:10730}));}
+ if(t>T(5)+.7)for(let i=0;i<3;i++)ink([[[960-i*30,700+i*20],[920-i*30,780+i*20],[960-i*30,780+i*20],[920-i*30,860+i*20]]],{w:6,col:YEL,id:10740+i,dbl:0,prog:pen(t,T(5)+.7+i*.1,.2)});});
 // S10 so beautiful people send the cake to friends
-scene(T(10)-.35,T(11)-.35,10400,2300,(t)=>{const D=TE(10)-T(10);
+scene(T(6)-.35,T(7)-.35,6500,2300,(t)=>{const D=TE(6)-T(6);
  phone(540,820,.8,-.02,1,(w,h)=>{solid(0,0,w,h,0,PAPER);txt('Արամի տորթերը',24,40,30,{al:'left',w:900,col:RED});solid(16,80,w-32,480,24,'#FBE7E3');
   for(let i=0;i<7;i++){const a=-Math.PI/2+(i-3)*.2;ink(Sh.line(w/2,80,w/2+Math.cos(a)*520,80+Math.sin(a)*520),{w:10,col:YEL,id:10800+i,dbl:0,alpha:.35});}
   cake(w/2,330,.9,1,10820,{tint:TRED});[[-110,-90],[-36,-100],[46,-98],[118,-90]].forEach(([x,y],i)=>shape(Sh.circle(w/2+x*.9,330+y*.9,16),{fill:RED,id:10850+i,w:3,off:0}));
-  txt('Ելակով ու մասկարպոնեով',w/2,610,30,{w:900});const tap=P(t,T(10)+.2,T(10)+.45);tf(w/2,720,1+.15*Math.sin(Math.PI*tap),0,()=>pill(0,0,'↗ Ուղարկել',32,{bg:BLUE,id:10860}));},{id:10870});
- const chats=[['Աննա',230,330],['Մամա 💛',850,420],['Աշխատանքի խումբ',230,1200],['Լիլիթ',850,1260]];
- chats.forEach(([n,x,y],i)=>{const s0=T(10)+.4+i*D*.17;const f=E.heavy(P(t,s0,s0+.45));if(f<=0)return;
+  txt('Ելակով ու մասկարպոնեով',w/2,610,30,{w:900});const tap=P(t,T(6)+.2,T(6)+.45);tf(w/2,720,1+.15*Math.sin(Math.PI*tap),0,()=>pill(0,0,'↗ Ուղարկել',32,{bg:BLUE,id:10860}));},{id:10870});
+ const chats=[['Աննա',230,330],['Մամա 💛',815,420],['Աշխատանքի խումբ',230,1200],['Լիլիթ',815,1260]];
+ chats.forEach(([n,x,y],i)=>{const s0=T(6)+.4+i*D*.17;const f=E.heavy(P(t,s0,s0+.45));if(f<=0)return;
   if(f<1){tf(L(540,x,f),L(800,y,f)-Math.sin(Math.PI*f)*160,L(.5,1,f),f*6.28,()=>{solid(-60,-50,120,100,14,'#FBE7E3');cake(0,8,.18,1,10900+i*20);});return;}
   lifted(.7,()=>tf(x,y,.85,(i%2?.04:-.04),()=>{solid(-170,-120,340,240,26,PAPER);ink(Sh.rrect(-170,-120,340,240,26),{w:4,id:10960+i});txt(n,-140,-90,26,{al:'left',w:900,maxW:280});solid(-140,-60,150,120,14,'#FBE7E3');cake(-65,10,.2,1,10980+i*20);
    const r=P(t,s0+.5,s0+.8);if(r>0){txt(['Վա՜յ','Պատվիրիր ինձ էլ','Ո՞րտեղից է','Ծննդյանս համար!'][i],20,-20,22,{al:'left',w:800,maxW:140,a:r});heart(80,50,.35*spring(r,.5),1,RED,11040+i);}}));});});
-// S11 price shows, 3 steps, paid online
-scene(T(11)-.35,T(12)-.35,11700,2300,(t)=>{const L12=TE(11)-T(11);
- const pr=P(t,T(11),T(11)+.3),st=Math.floor(cl((t-T(11)-L12*.35)/(L12*.35))*3.99),pd=P(t,T(11)+L12*.78,T(11)+L12*.78+.3);
- phone(540,900,.95,-.02,1,(w,h)=>goodSite(t,w,h,{prices:pr,steps:t>T(11)+L12*.3?st:0,paid:pd}),{id:11000});
- const tap=t>T(11)+L12*.3&&t<T(11)+L12*.75;if(tap){const k=st;finger(540-120*.95+k*120*.95,1420-Math.abs(Math.sin(t*9))*20,.9,-.15,11050);}
- const cd=E.land(P(t,T(11)+L12*.62,T(11)+L12*.8));if(cd>0)lifted(1,()=>tilt(L(1300,860,cd),1240,.7,.05,-.1,()=>{solid(-230,-140,460,280,28,'#123A73');solid(-180,-70,80,60,10,YEL);txt('•••• 4242',-180,40,34,{al:'left',w:800,col:PAPER,f:'MO'});}));
- const lab=t<T(11)+L12*.3?'Գինը երևում է':t<T(11)+L12*.7?'Պատվերը՝ 3 քայլ':'Վճարումը՝ առցանց';pill(540,300,lab,40,{bg:YEL,fg:K.ink,p:1,id:11060});});
 // S12 Aram can't bake fast enough
-scene(T(12)-.35,T(13)-.35,13000,2300,(t)=>{
+scene(T(7)-.35,T(8)-.35,7800,2300,(t)=>{
  tf(860,1000,1,0,()=>{shape(Sh.rrect(-150,-150,300,300,20),{fill:'#C9D3E2',id:11100});solid(-110,-90,220,150,14,ORG,.6+.2*Math.sin(t*9));ink(Sh.rrect(-110,-90,220,150,14),{w:4,id:11101});});
  const fast=t*14;person(420,1380,1.35,{...ARAM,id:11110,mood:'grin',sweat:true,look:.5,arms:[[1.6+Math.sin(fast)*.6,.8],[1.6+Math.cos(fast)*.6,.8]]});
  for(let i=0;i<14;i++){const u=((t*.9+i*.37)%1);const x=200+((i*131)%700),y=320+u*800;X.save();X.globalAlpha=(1-u)*.9;X.fillStyle=PAPER;X.beginPath();X.arc(x+Math.sin(t*3+i)*30,y,8+(i%3)*4,0,7);X.fill();X.restore();}
- for(let i=0;i<4;i++){const p=P(t,T(12)+.1+i*.3,T(12)+.35+i*.3);if(p>0)tf(L(1300,800,E.outExpo(p)),300+i*95,1,0,()=>{lifted(.5,()=>solid(-200,-36,400,72,20,PAPER));txt('🔔 Նոր պատվեր',0,2,32,{w:900,col:BLUE});});}
+ for(let i=0;i<4;i++){const p=P(t,T(7)+.1+i*.3,T(7)+.35+i*.3);if(p>0)tf(L(1300,730,E.outExpo(p)),300+i*95,.92,0,()=>{lifted(.5,()=>solid(-200,-36,400,72,20,PAPER));txt('🔔 Նոր պատվեր',0,2,32,{w:900,col:BLUE});});}
  [[150,1100],[250,1160],[150,1180]].forEach(([x,y],i)=>cake(x,y-i*10,.22,1,11300+i*30,{tint:[TRED,YEL,TBLUE][i]}));});
 // S13 comment «ԲՐԵՆԴ» + logo
-scene(T(13)-.35,END,14300,2300,(t)=>{const lt=t-T(13);
- const lg=spring(P(t,T(13),T(13)+.5),.65);if(lg>0&&LOGO.complete)tf(540,430,lg,0,()=>{const lw=300,lh=lw*LOGO.height/LOGO.width;X.save();X.globalCompositeOperation='multiply';X.drawImage(LOGO,-lw/2,-lh/2,lw,lh);X.restore();});
+scene(T(8)-.35,END,9100,2300,(t)=>{const lt=t-T(8);
+ const lg=spring(P(t,T(8),T(8)+.5),.65);if(lg>0&&LOGO.complete)tf(540,430,lg,0,()=>{const lw=300,lh=lw*LOGO.height/LOGO.width;X.save();X.globalCompositeOperation='multiply';X.drawImage(LOGO,-lw/2,-lh/2,lw,lh);X.restore();});
  lifted(1,()=>tilt(540,880,1,.03,-.04,()=>{solid(-440,-200,880,400,36,PAPER);ink(Sh.rrect(-440,-200,880,400,36),{w:5,id:11400});txt('Մեկնաբանություններ',-380,-140,30,{al:'left',w:800,col:GREY});
   shape(Sh.circle(-350,10,46),{fill:TRED,id:11401,w:4,off:0});solid(-280,-40,580,100,50,'#EEF2F8');ink(Sh.rrect(-280,-40,580,100,50),{w:3,id:11402,dbl:0});
-  const word='ԲՐԵՆԴ';const n=Math.floor(cl((t-T(13)-.6)/.8)*word.length);if(n==0)txt('Ավելացնել մեկնաբանություն…',-250,10,28,{al:'left',w:600,col:GREY});else txt([...word].slice(0,n).join(''),-250,12,52,{al:'left',w:900,col:RED});
-  const sent=t>T(13)+1.6;tf(360,10,1+.2*Math.sin(Math.PI*P(t,T(13)+1.6,T(13)+1.9)),0,()=>{solid(-50,-50,100,100,50,sent?BLUE:'#C0C6D0');const A=[[-20,-22],[26,0],[-20,22],[-10,0]];wash([A],PAPER,1,0);});
-  if(sent)tf(-20,L(10,-260,E.outExpo(P(t,T(13)+1.7,T(13)+2.2))),1,0,()=>pill(0,0,'Ուղարկված ✓',30,{bg:BLUE,p:P(t,T(13)+1.7,T(13)+1.9),id:11410}));}));
- if(WIY.complete){const u=E.land(P(t,T(13)+.8,T(13)+1.3));X.save();X.translate(L(1200,930,u),1180);X.rotate(-.18);X.drawImage(WIY,-80,-80,160,160*WIY.height/WIY.width);X.restore();}
- itxt('wiymood',540,1320,66,{fam:'S',prog:pen(t,T(13)+1.0,.7),id:11420,col:BLUE,maxW:500});});
+  const word='ԲՐԵՆԴ';const n=Math.floor(cl((t-T(8)-.6)/.8)*word.length);if(n==0)txt('Ավելացնել մեկնաբանություն…',-250,10,28,{al:'left',w:600,col:GREY});else txt([...word].slice(0,n).join(''),-250,12,52,{al:'left',w:900,col:RED});
+  const sent=t>T(8)+1.6;tf(360,10,1+.2*Math.sin(Math.PI*P(t,T(8)+1.6,T(8)+1.9)),0,()=>{solid(-50,-50,100,100,50,sent?BLUE:'#C0C6D0');const A=[[-20,-22],[26,0],[-20,22],[-10,0]];wash([A],PAPER,1,0);});
+  if(sent)tf(-20,L(10,-260,E.outExpo(P(t,T(8)+1.7,T(8)+2.2))),1,0,()=>pill(0,0,'Ուղարկված ✓',30,{bg:BLUE,p:P(t,T(8)+1.7,T(8)+1.9),id:11410}));}));
+ if(WIY.complete){const u=E.land(P(t,T(8)+.8,T(8)+1.3));X.save();X.translate(L(1200,930,u),1180);X.rotate(-.18);X.drawImage(WIY,-80,-80,160,160*WIY.height/WIY.width);X.restore();}
+ itxt('wiymood',540,1320,66,{fam:'S',prog:pen(t,T(8)+1.0,.7),id:11420,col:BLUE,maxW:500});});
 // ---------- camera ----------
 const KEYS=[];const TR=.38;function key(t,x,y,z=1,r=0,dip=.1){KEYS.push([t,x,y,z,r,dip]);}
-SC.forEach((s,i)=>{const d=i==7?.28:.1;key(s.t0+(i?.02:0),s.x,s.y,1,0,d);key(s.t1-(i==6?.7:TR),s.x+(i%2?-40:40),s.y+(i%2?30:-30),1.05,i%2?.012:-.012);});
+SC.forEach((s,i)=>{const d=i==3?.28:.1;key(s.t0+(i?.02:0),s.x,s.y,1,0,d);key(s.t1-(i==2?.45:TR),s.x+(i%2?-40:40),s.y+(i%2?30:-30),1.05,i%2?.012:-.012);});
 // S2: push in on the «website»
 KEYS.push([T(2)+.6,1300+10,-80-60,1.18,0,.1]);
 KEYS.sort((a,b)=>a[0]-b[0]);
@@ -261,9 +230,9 @@ const BL=document.createElement('canvas');BL.width=W;BL.height=H;const BX=BL.get
 const KEYW=/չափազանցություն|դանդաղ|հնանալ|գուշակեք|մանրադիտակ|կոճակ|մրցակցի|Instagram|ակնթարթում|ուղարկում|առցանց|թխել|ԲՐԵՆԴ|անվճար/i;
 function frost(x,y,w,h,r,tint,blur=16){X.save();X.beginPath();X.roundRect(x,y,w,h,r);X.clip();BX.setTransform(1,0,0,1,0,0);BX.clearRect(0,0,W,H);BX.drawImage(c,0,0);X.filter=`blur(${blur}px)`;X.drawImage(BL,0,0);X.filter='none';X.fillStyle=tint;X.fillRect(x,y,w,h);X.restore();}
 function tornPoly(x,y,w,h,seed){let s=seed;const R=()=>{s=(s*16807)%2147483647;return s/2147483647;};const pts=[];for(let i=0;i<=24;i++)pts.push([x+w*i/24,y+(R()-.5)*7]);for(let i=24;i>=0;i--)pts.push([x+w*i/24,y+h+(R()-.5)*7]);pts.push([x-4,y+h/2]);return pts;}
-function captions(t){const ln=LINES.find(l=>t>=l[0]-.05&&t<=l[1]+.25);if(!ln||window.NOCAP)return;if(t<.05)return;const st=window.CAPSTYLE;
+function captions(t){const ln=CAPS.find(l=>t>=l[0]-.05&&t<=l[1]+.25);if(!ln||window.NOCAP)return;if(t<.05)return;const st=window.CAPSTYLE;
  const size=st=='glass'?50:48;const words=ln[2].split(' ');X.font=`800 ${size}px SA`;const lines=[[]];for(const w of words){const cur=lines[lines.length-1];if(X.measureText([...cur,w].join(' ')).width>820&&cur.length)lines.push([w]);else cur.push(w);}
- const lens=words.map(w=>w.length+2),tot=lens.reduce((x,y)=>x+y,0);const starts=[];{let acc=0;lens.forEach(l=>{starts.push(ln[0]+(ln[1]-ln[0])*acc/tot);acc+=l;});}
+ const starts=ln[3].slice();
  const good=t>=TURN,lh=size*1.32,padX=34,padY=22;const widths=lines.map(l=>X.measureText(l.join(' ')).width);const bw=Math.max(...widths)+padX*2,bh=lines.length*lh+padY*2;const bx=W/2-bw/2,by=CAP_Y-bh/2;
  const life=P(t,ln[0]-.05,ln[0]+.15);const yIn=(1-E.outExpo(life))*24;
  X.save();X.translate(0,yIn);X.globalAlpha=E.outExpo(life);
