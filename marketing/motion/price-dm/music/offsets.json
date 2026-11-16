@@ -1,0 +1,52 @@
+{
+ "Funkorama": {
+  "offset": 0,
+  "build": 8.5,
+  "dur": 201.5
+ },
+ "Hyperfun": {
+  "offset": 149.1,
+  "build": 166.0,
+  "dur": 233.3
+ },
+ "Monkeys Spinning Monkeys": {
+  "offset": 53.6,
+  "build": 70.5,
+  "dur": 125.1
+ },
+ "Sneaky Snitch": {
+  "offset": 98.6,
+  "build": 115.5,
+  "dur": 136.6
+ },
+ "Investigations": {
+  "offset": 59.9,
+  "build": 90.0,
+  "dur": 93.5
+ },
+ "Poofy Reel": {
+  "offset": 0,
+  "build": 15.0,
+  "dur": 48.0
+ },
+ "Run Amok": {
+  "offset": 30.1,
+  "build": 47.0,
+  "dur": 107.1
+ },
+ "Fluffing a Duck": {
+  "offset": 15.1,
+  "build": 32.0,
+  "dur": 67.4
+ },
+ "The Builder": {
+  "offset": 0,
+  "build": 7.5,
+  "dur": 117.6
+ },
+ "Life of Riley": {
+  "offset": 0.6,
+  "build": 17.5,
+  "dur": 235.4
+ }
+}

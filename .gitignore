@@ -15,3 +15,6 @@ capdemo/
 caption_options.jpg
 marketing/motion/price-dm/fr/
 marketing/motion/price-dm/voice/*.raw
+marketing/motion/price-dm/music/*.mp3
+marketing/motion/price-dm/music/*.wav
+marketing/motion/price-dm/music/send/
